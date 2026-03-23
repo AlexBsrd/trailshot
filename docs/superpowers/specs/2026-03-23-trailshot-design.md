@@ -40,7 +40,7 @@ The site prioritizes a frictionless runner experience (no account required) whil
 | thumbnail_key | varchar | S3 path. Small grid thumbnail |
 | width | integer | Original dimensions |
 | height | integer | Original dimensions |
-| sort_order | integer | Display ordering within event |
+| sort_order | integer | Display ordering within event (set to upload order by default) |
 | uploaded_at | timestamptz | |
 
 ### PHOTO_BIB
@@ -174,7 +174,7 @@ For each uploaded photo:
 5. Goes to order page → enters email → clicks download
 6. For free events: immediate download, order logged at 0€
 7. For paid events (future): Stripe checkout → on payment success → download enabled
-8. Receives confirmation email with download link (valid 30 days)
+8. (Future) Receives confirmation email with download link (valid 30 days) — email service is out of scope for v1; download link is shown directly in the browser after order
 
 ### Photographer: Post-Race Workflow
 
@@ -196,6 +196,7 @@ For each uploaded photo:
 ### Pricing
 
 - **Per-event pricing:** photographer sets `price_single` and `price_pack` when creating an event
+- **Pack definition:** a pack is all photos matching the runner's bib number within a given event
 - **Pack discount:** pack price always less than (number of runner's photos × single price)
 - **Free events:** `is_free = true` — all photos downloadable at no cost, orders logged at 0€ for analytics
 - **Organizer-sponsored events:** organizer pays photographer directly (offline), photographer marks event as free
