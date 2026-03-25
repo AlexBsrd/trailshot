@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { StorageModule } from './storage/storage.module';
 import { ImageProcessingModule } from './image-processing/image-processing.module';
 import { EventsModule } from './events/events.module';
+import { PhotosModule } from './photos/photos.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EventsModule } from './events/events.module';
     StorageModule,
     ImageProcessingModule,
     EventsModule,
+    PhotosModule,
   ],
 })
 export class AppModule {}
