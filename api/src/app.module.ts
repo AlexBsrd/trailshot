@@ -7,6 +7,10 @@ import { Photo } from './photos/photo.entity';
 import { PhotoBib } from './photos/photo-bib.entity';
 import { Order } from './orders/order.entity';
 import { OrderPhoto } from './orders/order-photo.entity';
+import { AuthModule } from './auth/auth.module';
+import { StorageModule } from './storage/storage.module';
+import { ImageProcessingModule } from './image-processing/image-processing.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -27,6 +31,10 @@ import { OrderPhoto } from './orders/order-photo.entity';
         synchronize: true, // Dev only — use migrations in prod
       }),
     }),
+    AuthModule,
+    StorageModule,
+    ImageProcessingModule,
+    EventsModule,
   ],
 })
 export class AppModule {}
