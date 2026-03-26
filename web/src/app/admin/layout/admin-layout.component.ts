@@ -9,7 +9,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     <div class="admin-layout">
       <aside class="sidebar">
         <a routerLink="/" class="sidebar-logo">
-          <span class="logo-trail">Trail</span><span class="logo-shot">Shot</span>
+          <span class="logo-trail">TRAIL</span><span class="logo-shot">SHOT</span>
           <span class="logo-admin">Admin</span>
         </a>
         <nav class="sidebar-nav">
@@ -31,11 +31,13 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     </div>
   `,
   styles: [`
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
     .admin-layout { display: flex; min-height: 100vh; }
     .sidebar {
       width: 240px;
-      background: #fff;
-      border-right: 1px solid #e5e7eb;
+      background: $color-forest;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -43,16 +45,25 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     .sidebar-logo {
       display: flex;
       align-items: baseline;
-      gap: 4px;
+      gap: 0;
       padding: 1.25rem 1.5rem;
       text-decoration: none;
       font-size: 1.25rem;
-      font-weight: 700;
-      border-bottom: 1px solid #e5e7eb;
+      font-weight: $font-heading-weight;
+      font-family: $font-family;
+      letter-spacing: 1.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .logo-trail { color: #1a1a1a; }
-    .logo-shot { color: #2563eb; }
-    .logo-admin { color: #9ca3af; font-size: 0.75rem; font-weight: 500; margin-left: 4px; }
+    .logo-trail { color: $color-cream; }
+    .logo-shot { color: $color-cream; }
+    .logo-admin {
+      color: $color-sand-light;
+      font-size: $font-size-xs;
+      font-weight: 500;
+      margin-left: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
     .sidebar-nav {
       flex: 1;
       display: flex;
@@ -64,17 +75,27 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
       align-items: center;
       gap: 0.5rem;
       padding: 0.6rem 1.5rem;
-      color: #6b7280;
+      color: rgba(250, 247, 242, 0.75);
       text-decoration: none;
-      font-size: 0.95rem;
-      transition: background 0.15s, color 0.15s;
+      font-size: $font-size-body;
+      font-family: $font-family;
+      transition: background 0.15s, color 0.15s, border-left 0.15s;
+      border-left: 3px solid transparent;
     }
-    .sidebar-nav a:hover { background: #f3f4f6; color: #1a1a1a; }
-    .sidebar-nav a.active { background: #eef2ff; color: #2563eb; font-weight: 600; }
+    .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: $color-cream;
+    }
+    .sidebar-nav a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: $color-cream;
+      font-weight: 600;
+      border-left: 3px solid $color-sand-light;
+    }
     .nav-icon { font-size: 1.1rem; }
     .sidebar-footer {
       padding: 1rem 1.5rem;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
@@ -82,15 +103,18 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     .sidebar-link {
       background: none;
       border: none;
-      color: #9ca3af;
+      color: $color-cream;
       text-decoration: none;
-      font-size: 0.85rem;
+      font-size: $font-size-small;
+      font-family: $font-family;
       cursor: pointer;
       padding: 0.25rem 0;
       text-align: left;
+      opacity: 0.65;
+      transition: opacity 0.15s;
     }
-    .sidebar-link:hover { color: #6b7280; }
-    .admin-main { flex: 1; overflow-y: auto; background: #f8f9fa; }
+    .sidebar-link:hover { opacity: 1; }
+    .admin-main { flex: 1; overflow-y: auto; background: $color-cream; }
   `],
 })
 export class AdminLayoutComponent {

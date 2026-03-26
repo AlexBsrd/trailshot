@@ -1,0 +1,70 @@
+@use 'tokens' as *;
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@mixin fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@mixin hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-elevated;
+  }
+}
+
+@mixin glass($variant: 'dark') {
+  // Solid fallback for browsers without backdrop-filter
+  @if $variant == 'dark' {
+    background: $glass-dark-bg;
+  } @else if $variant == 'light' {
+    background: $glass-light-bg;
+  } @else if $variant == 'nav' {
+    background: $glass-nav-bg;
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    @if $variant == 'dark' {
+      backdrop-filter: $glass-dark-blur;
+      -webkit-backdrop-filter: $glass-dark-blur;
+    } @else if $variant == 'light' {
+      backdrop-filter: $glass-light-blur;
+      -webkit-backdrop-filter: $glass-light-blur;
+    } @else if $variant == 'nav' {
+      backdrop-filter: $glass-nav-blur;
+      -webkit-backdrop-filter: $glass-nav-blur;
+    }
+  }
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+  &.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

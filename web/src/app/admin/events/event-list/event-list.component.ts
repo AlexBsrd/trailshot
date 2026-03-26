@@ -38,8 +38,13 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
                 }
               </td>
               <td>
-                <button class="btn-toggle" [class.active]="event.isPublished" (click)="togglePublish(event)">
-                  {{ event.isPublished ? 'Oui' : 'Non' }}
+                <button
+                  class="badge-toggle badge"
+                  [class.badge-published]="event.isPublished"
+                  [class.badge-draft]="!event.isPublished"
+                  (click)="togglePublish(event)"
+                >
+                  {{ event.isPublished ? 'Publiée' : 'Brouillon' }}
                 </button>
               </td>
               <td class="actions">
@@ -54,35 +59,83 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
     </div>
   `,
   styles: [`
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
     .event-list { padding: 2rem; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .header h1 {
+      font-family: $font-family;
+      font-weight: $font-heading-weight;
+      color: $color-forest;
+    }
+
     .table { width: 100%; border-collapse: collapse; }
     .table th, .table td {
       padding: 0.75rem;
       text-align: left;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid $color-sand-light;
     }
-    .table th { color: #6b7280; font-weight: 600; }
+    .table thead tr {
+      background: rgba(27, 58, 45, 0.05);
+    }
+    .table th {
+      color: $color-text-muted;
+      font-weight: 600;
+      font-size: $font-size-small;
+    }
+    .table tbody tr:nth-child(even) {
+      background: $color-cream;
+    }
+    .table tbody tr:nth-child(odd) {
+      background: $color-white;
+    }
+    .table tbody tr:hover {
+      background: rgba(166, 139, 91, 0.08);
+    }
+
     .actions { display: flex; gap: 0.75rem; }
-    .actions a { color: #2563eb; text-decoration: none; }
+    .actions a {
+      color: $color-forest-light;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .actions a:hover {
+      color: $color-forest;
+    }
+
     .action-delete {
       background: none;
       border: none;
-      color: #ef4444;
+      color: $color-danger;
       cursor: pointer;
       font-size: inherit;
       padding: 0;
+      font-weight: 500;
+      transition: color 0.15s;
     }
-    .action-delete:hover { text-decoration: underline; }
-    .btn-toggle {
-      background: #d1d5db;
-      color: #6b7280;
+    .action-delete:hover {
+      text-decoration: underline;
+    }
+
+    :host .btn-primary {
+      background: $color-forest;
+      color: $color-cream;
+    }
+
+    .badge-toggle {
       border: none;
-      padding: 4px 12px;
-      border-radius: 4px;
       cursor: pointer;
+      transition: opacity 0.15s;
     }
-    .btn-toggle.active { background: #22c55e; color: #fff; }
+    .badge-toggle:hover { opacity: 0.8; }
   `],
 })
 export class EventListComponent implements OnInit {

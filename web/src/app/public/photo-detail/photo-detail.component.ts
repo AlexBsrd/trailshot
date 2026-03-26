@@ -42,23 +42,74 @@ import { environment } from '../../../environments/environment';
     </div>
   `,
   styles: [`
-    .photo-detail { padding: 2rem; max-width: 900px; margin: 0 auto; }
-    .back-link { color: #2563eb; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
+    .photo-detail {
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      background: $color-cream;
+      min-height: 100vh;
+    }
+    .back-link {
+      color: $color-forest-light;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1rem;
+      font-weight: 500;
+      transition: color 0.2s;
+
+      &:hover {
+        color: $color-forest;
+      }
+    }
     .photo-container {
-      border-radius: 8px;
+      border-radius: $radius-md;
       overflow: hidden;
       margin-bottom: 1.5rem;
+      box-shadow: $shadow-elevated;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
     }
-    .photo-container img { width: 100%; display: block; }
-    .photo-info h2 { margin-bottom: 0.5rem; }
-    .bibs { color: #6b7280; margin-bottom: 1rem; }
+    .photo-container img {
+      width: 100%;
+      display: block;
+    }
+    .photo-info h2 {
+      margin-bottom: 0.5rem;
+      color: $color-forest;
+      font-weight: $font-subheading-weight;
+    }
+    .bibs {
+      color: $color-text;
+      margin-bottom: 1rem;
+    }
     .bib-tag {
-      background: #e0e7ff;
-      padding: 2px 10px;
-      border-radius: 4px;
+      background: $color-sand-light;
+      color: $color-forest;
+      padding: 4px 10px;
+      border-radius: $radius-sm;
       margin-left: 4px;
+      font-size: $font-size-small;
+      font-weight: 600;
     }
-    .actions { margin-top: 1rem; }
+    .actions {
+      margin-top: 1rem;
+    }
+    .actions .btn-primary {
+      background: $color-sand-light;
+      color: $color-forest;
+      font-weight: $font-subheading-weight;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+    }
+    @media (max-width: $breakpoint-sm) {
+      .actions .btn-primary {
+        width: 100%;
+      }
+    }
   `],
 })
 export class PhotoDetailComponent implements OnInit {

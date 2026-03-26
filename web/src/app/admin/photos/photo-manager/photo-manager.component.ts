@@ -74,12 +74,21 @@ import { environment } from '../../../../environments/environment';
     </div>
   `,
   styles: [`
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
     .photo-manager { padding: 2rem; }
     .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-    .header h1 { margin-bottom: 0.25rem; }
-    .subtitle { color: #6b7280; font-size: 0.9rem; }
+    .header h1 {
+      margin-bottom: 0.25rem;
+      font-family: $font-family;
+      font-weight: $font-heading-weight;
+      color: $color-forest;
+    }
+    .subtitle { color: $color-text-muted; font-size: 0.9rem; }
     .header-actions { display: flex; gap: 0.5rem; }
-    .empty-state { text-align: center; padding: 4rem 2rem; color: #6b7280; }
+    .header-actions a { color: $color-forest-light; }
+    .empty-state { text-align: center; padding: 4rem 2rem; color: $color-text-muted; }
     .empty-state .btn { margin-top: 1rem; }
     .toolbar {
       display: flex;
@@ -87,9 +96,10 @@ import { environment } from '../../../../environments/environment';
       gap: 0.75rem;
       margin-bottom: 1rem;
       padding: 0.75rem 1rem;
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
+      background: $color-white;
+      border-radius: $radius-md;
+      border: 1px solid rgba(27, 58, 45, 0.1);
+      color: $color-text;
     }
     .photo-grid {
       display: grid;
@@ -97,13 +107,13 @@ import { environment } from '../../../../environments/environment';
       gap: 0.75rem;
     }
     .photo-card {
-      background: #fff;
-      border-radius: 8px;
+      background: $color-white;
+      border-radius: $radius-md;
       overflow: hidden;
       border: 2px solid transparent;
       transition: border-color 0.15s;
     }
-    .photo-card.selected { border-color: #2563eb; }
+    .photo-card.selected { border-color: $color-forest-light; }
     .photo-img { position: relative; cursor: pointer; }
     .photo-img img { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; }
     .select-check {
@@ -113,62 +123,68 @@ import { environment } from '../../../../environments/environment';
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: #fff;
-      border: 2px solid #d1d5db;
+      background: $color-white;
+      border: 2px solid $color-sand-light;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
       color: transparent;
       transition: all 0.15s;
     }
     .select-check.visible {
-      background: #2563eb;
-      border-color: #2563eb;
-      color: #fff;
+      background: $color-forest-light;
+      border-color: $color-forest-light;
+      color: $color-white;
     }
     .photo-info { padding: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
     .bibs { display: flex; gap: 4px; flex-wrap: wrap; }
     .bib-tag {
-      background: #eef2ff;
-      color: #2563eb;
+      background: $color-sand-light;
+      color: $color-forest;
       padding: 1px 6px;
       border-radius: 3px;
-      font-size: 0.75rem;
+      font-size: $font-size-xs;
       font-weight: 600;
     }
-    .no-bib { color: #d1d5db; font-size: 0.75rem; font-style: italic; }
+    .no-bib { color: $color-text-muted; font-size: $font-size-xs; font-style: italic; }
     .photo-actions { display: flex; gap: 2px; }
     .action-btn {
       background: none;
       border: none;
       cursor: pointer;
       padding: 4px;
-      border-radius: 4px;
+      border-radius: $radius-sm;
       font-size: 0.9rem;
       transition: background 0.15s;
     }
-    .action-btn:hover { background: #f3f4f6; }
-    .action-btn.danger:hover { background: #fef2f2; }
-    .btn-danger { background: #ef4444; color: #fff; }
+    .action-btn:hover { background: rgba(74, 123, 90, 0.06); }
+    .action-btn.danger { color: $color-danger; }
+    .action-btn.danger:hover { background: rgba(184, 64, 64, 0.08); }
+    .btn-danger { background: $color-danger; color: $color-white; }
     .lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.8);
+      background: rgba(27, 58, 45, 0.85);
       z-index: 200;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      animation: fadeIn 0.15s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .lightbox-content { position: relative; max-width: 90vw; max-height: 90vh; }
-    .lightbox-content img { max-width: 100%; max-height: 85vh; border-radius: 8px; display: block; }
+    .lightbox-content img { max-width: 100%; max-height: 85vh; border-radius: $radius-md; display: block; }
     .lightbox-close {
       position: absolute;
       top: -12px;
       right: -12px;
-      background: #fff;
-      color: #1a1a1a;
+      background: $color-white;
+      color: $color-forest;
       border: none;
       width: 36px;
       height: 36px;
@@ -178,7 +194,7 @@ import { environment } from '../../../../environments/environment';
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: $shadow-elevated;
     }
   `],
 })

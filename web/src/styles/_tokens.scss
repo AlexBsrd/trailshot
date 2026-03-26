@@ -1,0 +1,45 @@
+// Colors
+$color-forest: #1B3A2D;
+$color-forest-light: #4A7B5A;
+$color-sand: #A68B5B;
+$color-sand-light: #D4C5A0;
+$color-cream: #FAF7F2;
+$color-white: #FFFFFF;
+$color-text: #2D4F3E;
+$color-text-muted: #7A8B7E;
+$color-success: #3A7D4A;
+$color-warning: #C4963A;
+$color-danger: #B84040;
+
+// Typography
+$font-family: 'Inter', system-ui, sans-serif;
+$font-heading-weight: 800;
+$font-subheading-weight: 700;
+$font-body-weight: 400;
+$font-size-hero: 2.5rem;
+$font-size-h1: 1.5rem;
+$font-size-h2: 1.25rem;
+$font-size-body: 0.95rem;
+$font-size-small: 0.85rem;
+$font-size-xs: 0.75rem;
+
+// Spacing & Radius
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 16px;
+$shadow-card: 0 2px 8px rgba(27, 58, 45, 0.08);
+$shadow-elevated: 0 8px 24px rgba(27, 58, 45, 0.12);
+
+// Breakpoints
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+// Glass-morphism
+$glass-dark-bg: rgba(27, 58, 45, 0.65);
+$glass-dark-blur: blur(16px);
+$glass-light-bg: rgba(255, 255, 255, 0.12);
+$glass-light-blur: blur(12px);
+$glass-nav-bg: rgba(27, 58, 45, 0.85);
+$glass-nav-blur: blur(12px);

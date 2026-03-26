@@ -56,37 +56,64 @@ import { ApiService } from '../../../core/services/api.service';
     </div>
   `,
   styles: [`
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
     .orders-page { padding: 2rem; }
+    .orders-page h1 {
+      font-family: $font-family;
+      font-weight: $font-heading-weight;
+      color: $color-forest;
+      font-size: $font-size-h1;
+    }
     .stats {
       display: flex;
       gap: 1.5rem;
       margin-bottom: 2rem;
     }
     .stat {
-      background: #fff;
+      background: $color-white;
       padding: 1rem 1.5rem;
-      border-radius: 8px;
+      border-radius: $radius-md;
       display: flex;
       flex-direction: column;
+      box-shadow: $shadow-card;
     }
-    .stat-value { font-size: 1.5rem; font-weight: 700; color: #2563eb; }
-    .stat-label { color: #6b7280; font-size: 0.875rem; }
+    .stat-value {
+      font-size: 1.5rem;
+      font-family: $font-family;
+      font-weight: $font-heading-weight;
+      color: $color-forest;
+    }
+    .stat-label {
+      color: $color-sand;
+      font-size: $font-size-small;
+    }
     .table { width: 100%; border-collapse: collapse; }
+    .table thead th {
+      background: rgba(27, 58, 45, 0.05);
+    }
     .table th, .table td {
       padding: 0.75rem;
       text-align: left;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid rgba(27, 58, 45, 0.08);
     }
-    .table th { color: #6b7280; font-weight: 600; }
-    .badge-pack { background: #2563eb; }
-    .badge-delivered { background: #22c55e; }
-    .badge-pending { background: #f59e0b; }
-    .badge-paid { background: #22c55e; }
+    .table th {
+      color: $color-text-muted;
+      font-weight: 600;
+    }
+    .table tbody tr:nth-child(odd) { background: $color-white; }
+    .table tbody tr:nth-child(even) { background: $color-cream; }
+    .table tbody tr:hover { background: rgba(166, 139, 91, 0.08); }
+    .badge-pack { background: $color-forest-light; }
+    .badge-delivered { background: $color-success; }
+    .badge-pending { background: $color-warning; }
+    .badge-paid { background: $color-success; }
     .badge {
       padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      color: #fff;
+      border-radius: $radius-sm;
+      font-size: $font-size-xs;
+      color: $color-white;
     }
   `],
 })

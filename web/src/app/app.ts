@@ -10,33 +10,50 @@ import { NavbarComponent } from './layout/navbar/navbar.component';
     @if (!isAdmin()) {
       <app-navbar />
     }
-    <main [class.admin-page]="isAdmin()">
+    <main [class.admin-page]="isAdmin()" [class.has-hero]="isHeroPage()">
       <router-outlet />
     </main>
     @if (!isAdmin()) {
       <footer class="footer">
         <span>&copy; {{ year }} TrailShot</span>
-        <a routerLink="/admin">Administration</a>
+        @if (isHome()) {
+          <a routerLink="/admin">Administration</a>
+        }
       </footer>
     }
   `,
   styles: [`
-    main { min-height: calc(100vh - 120px); }
-    main.admin-page { min-height: 100vh; }
+    @use 'tokens' as *;
+
+    main {
+      min-height: calc(100vh - 120px);
+      padding-top: 64px;
+    }
+    main.has-hero {
+      padding-top: 0;
+    }
+    main.admin-page {
+      min-height: 100vh;
+      padding-top: 0;
+    }
     .footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 2rem;
-      border-top: 1px solid #e5e7eb;
-      color: #9ca3af;
-      font-size: 0.85rem;
+      padding: 1.5rem 2rem;
+      background: $color-forest;
+      color: rgba($color-cream, 0.7);
+      font-size: $font-size-small;
     }
     .footer a {
-      color: #9ca3af;
+      color: rgba($color-cream, 0.7);
       text-decoration: none;
+      transition: opacity 0.2s;
     }
-    .footer a:hover { color: #6b7280; }
+    .footer a:hover {
+      opacity: 1;
+      color: $color-cream;
+    }
   `],
 })
 export class App {
@@ -45,5 +62,14 @@ export class App {
 
   isAdmin(): boolean {
     return this.router.url.startsWith('/admin');
+  }
+
+  isHome(): boolean {
+    return this.router.url === '/' || this.router.url === '';
+  }
+
+  isHeroPage(): boolean {
+    const url = this.router.url.split('?')[0];
+    return url === '/' || url === '/about';
   }
 }

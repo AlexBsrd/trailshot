@@ -57,29 +57,39 @@ import { ApiService } from '../../../core/services/api.service';
     </div>
   `,
   styles: [`
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
     .upload-page { padding: 2rem; }
+    .upload-page h1 {
+      font-family: $font-family;
+      font-weight: $font-heading-weight;
+      color: $color-text;
+    }
     .dropzone {
-      border: 2px dashed #d1d5db;
-      border-radius: 12px;
+      border: 2px dashed $color-sand;
+      border-radius: $radius-lg;
       padding: 3rem;
       text-align: center;
       cursor: pointer;
+      color: $color-text;
       transition: border-color 0.2s, background 0.2s;
     }
     .dropzone:hover, .dropzone.dragging {
-      border-color: #2563eb;
-      background: rgba(37, 99, 235, 0.05);
+      border-color: $color-forest-light;
+      background: rgba(74, 123, 90, 0.04);
     }
-    .hint { color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem; }
+    .hint { color: $color-text-muted; font-size: $font-size-small; margin-top: 0.5rem; }
     .file-info {
       margin-top: 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      color: $color-text;
     }
-    .progress { margin-top: 1rem; color: #2563eb; }
+    .progress { margin-top: 1rem; color: $color-forest-light; }
     .success { margin-top: 1rem; }
-    .success p { color: #22c55e; margin-bottom: 1rem; }
+    .success p { color: $color-success; margin-bottom: 1rem; }
     .actions { display: flex; gap: 0.75rem; }
   `],
 })

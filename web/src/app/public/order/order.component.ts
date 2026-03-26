@@ -61,26 +61,109 @@ import { environment } from '../../../environments/environment';
     </div>
   `,
   styles: [`
-    .order-page { padding: 2rem; max-width: 600px; margin: 0 auto; }
-    .order-summary {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 8px;
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
+    .order-page {
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      background: $color-cream;
+      min-height: 100vh;
+    }
+    .order-page h1 {
+      color: $color-forest;
+      font-weight: $font-heading-weight;
       margin-bottom: 1.5rem;
     }
-    .order-form { display: flex; flex-direction: column; gap: 0.75rem; }
-    .order-form label { color: #4b5563; }
-    .notice { color: #6b7280; font-size: 0.875rem; }
-    .empty { text-align: center; padding: 3rem; }
-    .empty p { color: #9ca3af; margin-bottom: 1rem; }
-    .success { text-align: center; padding: 2rem; }
-    .success h2 { color: #22c55e; margin-bottom: 0.5rem; }
-    .success .btn { margin: 0.5rem; }
+    .order-summary {
+      background: $color-white;
+      padding: 1rem;
+      border-radius: $radius-md;
+      margin-bottom: 1.5rem;
+      box-shadow: $shadow-card;
+      color: $color-text;
+      font-weight: $font-subheading-weight;
+    }
+    .order-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .order-form label {
+      color: $color-text;
+      font-weight: 500;
+    }
+    .order-form .btn-primary {
+      background: $color-sand-light;
+      color: $color-forest;
+      font-weight: $font-subheading-weight;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+    .notice {
+      color: $color-text-muted;
+      font-size: $font-size-small;
+    }
+
+    /* Empty cart */
+    .empty {
+      text-align: center;
+      padding: 3rem;
+    }
+    .empty p {
+      color: $color-text-muted;
+      margin-bottom: 1rem;
+    }
+    .empty .btn-primary {
+      background: $color-sand-light;
+      color: $color-forest;
+      font-weight: $font-subheading-weight;
+      border-radius: 8px;
+    }
+
+    /* Success state */
+    .success {
+      text-align: center;
+      padding: 2rem;
+      @include fade-in-up;
+    }
+    .success h2 {
+      color: $color-success;
+      margin-bottom: 0.5rem;
+      font-weight: $font-heading-weight;
+    }
+    .success p {
+      color: $color-text;
+    }
+    .success .notice {
+      color: $color-text-muted;
+      font-size: $font-size-small;
+    }
+    .success .btn {
+      margin: 0.5rem;
+    }
+    .success .btn-primary {
+      background: $color-forest-light;
+      color: $color-white;
+      font-weight: $font-subheading-weight;
+      border-radius: 8px;
+    }
+    .success .btn-secondary {
+      background: $color-sand-light;
+      color: $color-forest;
+      border-radius: 8px;
+    }
+
     .badge-pack {
-      background: #2563eb;
+      background: $color-sand;
+      color: $color-white;
       padding: 2px 8px;
       border-radius: 4px;
-      font-size: 0.8rem;
+      font-size: $font-size-xs;
+      font-weight: 600;
       margin-left: 0.5rem;
     }
   `],
