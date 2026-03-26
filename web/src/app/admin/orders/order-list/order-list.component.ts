@@ -63,22 +63,22 @@ import { ApiService } from '../../../core/services/api.service';
       margin-bottom: 2rem;
     }
     .stat {
-      background: #1a1a1a;
+      background: #fff;
       padding: 1rem 1.5rem;
       border-radius: 8px;
       display: flex;
       flex-direction: column;
     }
-    .stat-value { font-size: 1.5rem; font-weight: 700; color: #4a9eff; }
-    .stat-label { color: #999; font-size: 0.875rem; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: #2563eb; }
+    .stat-label { color: #6b7280; font-size: 0.875rem; }
     .table { width: 100%; border-collapse: collapse; }
     .table th, .table td {
       padding: 0.75rem;
       text-align: left;
-      border-bottom: 1px solid #222;
+      border-bottom: 1px solid #e5e7eb;
     }
-    .table th { color: #999; font-weight: 600; }
-    .badge-pack { background: #4a9eff; }
+    .table th { color: #6b7280; font-weight: 600; }
+    .badge-pack { background: #2563eb; }
     .badge-delivered { background: #22c55e; }
     .badge-pending { background: #f59e0b; }
     .badge-paid { background: #22c55e; }

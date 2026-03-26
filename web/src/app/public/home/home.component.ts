@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService, EventSummary } from '../../core/services/api.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +11,7 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
   template: `
     <section class="hero">
       <h1>Retrouvez vos photos de course</h1>
-      <p>Recherchez par numero de dossard et telechargez vos photos de trail</p>
+      <p>Recherchez par numéro de dossard et téléchargez vos photos de trail</p>
       <form class="search-form" (ngSubmit)="search()">
         <select [(ngModel)]="selectedSlug" name="event" class="input">
           <option value="">Choisir une course...</option>
@@ -22,7 +23,7 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
           type="text"
           [(ngModel)]="bibNumber"
           name="bib"
-          placeholder="Numero de dossard"
+          placeholder="Numéro de dossard"
           class="input"
         />
         <button type="submit" class="btn btn-primary" [disabled]="!selectedSlug">
@@ -32,11 +33,11 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
     </section>
 
     <section class="recent-events">
-      <h2>Courses recentes</h2>
+      <h2>Courses récentes</h2>
       <div class="events-grid">
         @for (event of events(); track event.id) {
           <a [routerLink]="['/events', event.slug]" class="event-card">
-            <div class="event-card-img"></div>
+            <div class="event-card-img" [style.background-image]="event.coverPhotoId ? 'url(' + getCoverUrl(event) + ')' : ''"></div>
             <div class="event-card-body">
               <h3>{{ event.name }}</h3>
               <p class="event-meta">{{ event.date }} · {{ event.location }}</p>
@@ -47,7 +48,7 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
           </a>
         }
         @if (events().length === 0) {
-          <p class="empty">Aucune course publiee pour le moment.</p>
+          <p class="empty">Aucune course publiée pour le moment.</p>
         }
       </div>
     </section>
@@ -56,10 +57,10 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
     .hero {
       text-align: center;
       padding: 4rem 2rem;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
     }
     .hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    .hero p { color: #999; margin-bottom: 2rem; }
+    .hero p { color: #6b7280; margin-bottom: 2rem; }
     .search-form {
       display: flex;
       gap: 0.75rem;
@@ -76,22 +77,24 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
       gap: 1.5rem;
     }
     .event-card {
-      background: #1a1a1a;
+      background: #fff;
       border-radius: 8px;
       overflow: hidden;
       text-decoration: none;
-      color: #fff;
+      color: #1a1a1a;
       transition: transform 0.2s;
     }
     .event-card:hover { transform: translateY(-2px); }
     .event-card-img {
       height: 160px;
-      background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+      background: linear-gradient(135deg, #e0e7ff, #eef2ff);
+      background-size: cover;
+      background-position: center;
     }
     .event-card-body { padding: 1rem; }
     .event-card-body h3 { margin-bottom: 0.25rem; }
-    .event-meta { color: #999; font-size: 0.875rem; }
-    .empty { color: #666; text-align: center; grid-column: 1 / -1; }
+    .event-meta { color: #6b7280; font-size: 0.875rem; }
+    .empty { color: #9ca3af; text-align: center; grid-column: 1 / -1; }
   `],
 })
 export class HomeComponent implements OnInit {
@@ -104,6 +107,10 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.api.getEvents().subscribe((events) => this.events.set(events));
+  }
+
+  getCoverUrl(event: EventSummary): string {
+    return `${environment.storageUrl}/thumbnails/${event.id}/${event.coverPhotoId}.jpg`;
   }
 
   search() {

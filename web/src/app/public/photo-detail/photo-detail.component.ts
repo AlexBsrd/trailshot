@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
   template: `
     <div class="photo-detail">
       @if (photo() && event()) {
-        <a [routerLink]="['/events', slug]" class="back-link">&larr; Retour a la galerie</a>
+        <a [routerLink]="['/events', slug]" class="back-link">&larr; Retour à la galerie</a>
 
         <div class="photo-container">
           <img [src]="getPreviewUrl(photo()!)" [alt]="'Photo'" />
@@ -30,7 +30,7 @@ import { environment } from '../../../environments/environment';
 
           <div class="actions">
             @if (event()!.isFree) {
-              <button class="btn btn-primary" (click)="downloadFree()">Telecharger</button>
+              <button class="btn btn-primary" (click)="downloadFree()">Télécharger</button>
             } @else {
               <button class="btn btn-primary" (click)="buyPhoto()">
                 Acheter cette photo — {{ formatPrice(event()!.priceSingle) }}
@@ -43,7 +43,7 @@ import { environment } from '../../../environments/environment';
   `,
   styles: [`
     .photo-detail { padding: 2rem; max-width: 900px; margin: 0 auto; }
-    .back-link { color: #4a9eff; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+    .back-link { color: #2563eb; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
     .photo-container {
       border-radius: 8px;
       overflow: hidden;
@@ -51,9 +51,9 @@ import { environment } from '../../../environments/environment';
     }
     .photo-container img { width: 100%; display: block; }
     .photo-info h2 { margin-bottom: 0.5rem; }
-    .bibs { color: #999; margin-bottom: 1rem; }
+    .bibs { color: #6b7280; margin-bottom: 1rem; }
     .bib-tag {
-      background: #2a2a3e;
+      background: #e0e7ff;
       padding: 2px 10px;
       border-radius: 4px;
       margin-left: 4px;
@@ -80,7 +80,7 @@ export class PhotoDetailComponent implements OnInit {
   }
 
   getPreviewUrl(photo: PhotoSummary): string {
-    return `${environment.apiUrl.replace('/api', '')}:9000/trailshot/${photo.previewKey}`;
+    return `${environment.storageUrl}/${photo.previewKey}`;
   }
 
   formatPrice(cents: number): string {

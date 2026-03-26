@@ -43,7 +43,12 @@ export class EventsService {
 
   async update(id: string, dto: UpdateEventDto): Promise<Event> {
     const event = await this.findById(id);
-    Object.assign(event, dto);
+    // Only apply defined fields to avoid overwriting with undefined
+    for (const [key, value] of Object.entries(dto)) {
+      if (value !== undefined) {
+        (event as any)[key] = value;
+      }
+    }
     if (dto.name) {
       event.slug = this.generateSlug(dto.name);
     }

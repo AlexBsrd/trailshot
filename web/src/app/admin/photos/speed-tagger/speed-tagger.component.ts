@@ -15,7 +15,7 @@ import { environment } from '../../../../environments/environment';
           <h2>{{ event()!.name }}</h2>
           <span class="progress-text">
             Photo {{ currentIndex() + 1 }}/{{ photos().length }}
-            — {{ taggedPercent() }}% taggees
+            — {{ taggedPercent() }}% tagguées
           </span>
           <span class="hints">Enter = valider · ← → = naviguer · Vide = repeter</span>
         </div>
@@ -32,7 +32,7 @@ import { environment } from '../../../../environments/environment';
             type="text"
             [(ngModel)]="bibValue"
             name="bib"
-            [placeholder]="lastBibs().length ? 'Derniers: ' + lastBibs().join(', ') : 'Dossard(s), separes par des virgules'"
+            [placeholder]="lastBibs().length ? 'Derniers: ' + lastBibs().join(', ') : 'Dossard(s), séparés par des virgules'"
             class="input bib-input"
             (keydown.enter)="validateAndAdvance()"
           />
@@ -61,12 +61,12 @@ import { environment } from '../../../../environments/environment';
       align-items: center;
       gap: 1rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid #222;
+      border-bottom: 1px solid #e5e7eb;
       flex-wrap: wrap;
     }
     .tagger-header h2 { margin: 0; }
-    .progress-text { color: #4a9eff; }
-    .hints { color: #666; font-size: 0.8rem; margin-left: auto; }
+    .progress-text { color: #2563eb; }
+    .hints { color: #9ca3af; font-size: 0.8rem; margin-left: auto; }
     .main-photo {
       flex: 1;
       display: flex;
@@ -106,7 +106,7 @@ import { environment } from '../../../../environments/environment';
       opacity: 0.5;
       transition: opacity 0.2s, border-color 0.2s;
     }
-    .strip-thumb.current { border-color: #4a9eff; opacity: 1; }
+    .strip-thumb.current { border-color: #2563eb; opacity: 1; }
     .strip-thumb.tagged { border-color: #22c55e; opacity: 0.8; }
     .strip-thumb img { width: 100%; height: 100%; object-fit: cover; }
   `],
@@ -197,11 +197,11 @@ export class SpeedTaggerComponent implements OnInit {
   }
 
   getPreviewUrl(photo: PhotoSummary): string {
-    return `${environment.apiUrl.replace('/api', '')}:9000/trailshot/${photo.previewKey}`;
+    return `${environment.storageUrl}/${photo.previewKey}`;
   }
 
   getThumbnailUrl(photo: PhotoSummary): string {
-    return `${environment.apiUrl.replace('/api', '')}:9000/trailshot/${photo.thumbnailKey}`;
+    return `${environment.storageUrl}/${photo.thumbnailKey}`;
   }
 
   private markCurrentAsTagged() {

@@ -26,7 +26,7 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
 
         <label class="checkbox-label">
           <input type="checkbox" [(ngModel)]="form.isFree" name="isFree" />
-          Evenement gratuit
+          Événement gratuit
         </label>
 
         @if (!form.isFree) {
@@ -54,7 +54,7 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
   styles: [`
     .event-form-page { padding: 2rem; max-width: 600px; }
     form { display: flex; flex-direction: column; gap: 0.75rem; }
-    label { color: #ccc; }
+    label { color: #4b5563; }
     .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
     .price-row { display: flex; gap: 1rem; }
     .price-row > div { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }

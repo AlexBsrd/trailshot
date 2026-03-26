@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
         </div>
       } @else if (!orderComplete()) {
         <div class="order-summary">
-          <p>{{ cart.count() }} photo(s) selectionnee(s)
+          <p>{{ cart.count() }} photo(s) sélectionnée(s)
             @if (cart.isPackMode()) {
               <span class="badge badge-pack">Pack</span>
             }
@@ -38,22 +38,22 @@ import { environment } from '../../../environments/environment';
             class="input"
             required
           />
-          <p class="notice">Vos photos sont telechargeables pendant 30 jours.</p>
+          <p class="notice">Vos photos sont téléchargeables pendant 30 jours.</p>
           <button type="submit" class="btn btn-primary" [disabled]="!email || submitting()">
             @if (submitting()) {
               Traitement en cours...
             } @else {
-              Telecharger
+              Télécharger
             }
           </button>
         </form>
       } @else {
         <div class="success">
-          <h2>Commande confirmee !</h2>
-          <p>Vos photos sont pretes au telechargement.</p>
+          <h2>Commande confirmée !</h2>
+          <p>Vos photos sont prêtes au téléchargement.</p>
           <p class="notice">Lien valide jusqu'au {{ expiresAt() }}</p>
           <a [href]="downloadUrl()" class="btn btn-primary" target="_blank">
-            Telecharger
+            Télécharger
           </a>
           <a routerLink="/events" class="btn btn-secondary">Retour aux courses</a>
         </div>
@@ -63,21 +63,21 @@ import { environment } from '../../../environments/environment';
   styles: [`
     .order-page { padding: 2rem; max-width: 600px; margin: 0 auto; }
     .order-summary {
-      background: #1a1a1a;
+      background: #fff;
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1.5rem;
     }
     .order-form { display: flex; flex-direction: column; gap: 0.75rem; }
-    .order-form label { color: #ccc; }
-    .notice { color: #999; font-size: 0.875rem; }
+    .order-form label { color: #4b5563; }
+    .notice { color: #6b7280; font-size: 0.875rem; }
     .empty { text-align: center; padding: 3rem; }
-    .empty p { color: #666; margin-bottom: 1rem; }
+    .empty p { color: #9ca3af; margin-bottom: 1rem; }
     .success { text-align: center; padding: 2rem; }
     .success h2 { color: #22c55e; margin-bottom: 0.5rem; }
     .success .btn { margin: 0.5rem; }
     .badge-pack {
-      background: #4a9eff;
+      background: #2563eb;
       padding: 2px 8px;
       border-radius: 4px;
       font-size: 0.8rem;

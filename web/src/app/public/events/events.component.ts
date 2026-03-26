@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService, EventSummary } from '../../core/services/api.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-events',
@@ -19,7 +20,7 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
       <div class="events-grid">
         @for (event of filteredEvents(); track event.id) {
           <a [routerLink]="['/events', event.slug]" class="event-card">
-            <div class="event-card-img"></div>
+            <div class="event-card-img" [style.background-image]="event.coverPhotoId ? 'url(' + getCoverUrl(event) + ')' : ''"></div>
             <div class="event-card-body">
               <h3>{{ event.name }}</h3>
               <p class="event-meta">{{ event.date }} · {{ event.location }}</p>
@@ -30,7 +31,7 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
           </a>
         }
         @if (filteredEvents().length === 0) {
-          <p class="empty">Aucune course trouvee.</p>
+          <p class="empty">Aucune course trouvée.</p>
         }
       </div>
     </div>
@@ -45,22 +46,24 @@ import { ApiService, EventSummary } from '../../core/services/api.service';
       gap: 1.5rem;
     }
     .event-card {
-      background: #1a1a1a;
+      background: #fff;
       border-radius: 8px;
       overflow: hidden;
       text-decoration: none;
-      color: #fff;
+      color: #1a1a1a;
       transition: transform 0.2s;
     }
     .event-card:hover { transform: translateY(-2px); }
     .event-card-img {
       height: 160px;
-      background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+      background: linear-gradient(135deg, #e0e7ff, #eef2ff);
+      background-size: cover;
+      background-position: center;
     }
     .event-card-body { padding: 1rem; }
     .event-card-body h3 { margin-bottom: 0.25rem; }
-    .event-meta { color: #999; font-size: 0.875rem; }
-    .empty { color: #666; text-align: center; grid-column: 1 / -1; }
+    .event-meta { color: #6b7280; font-size: 0.875rem; }
+    .empty { color: #9ca3af; text-align: center; grid-column: 1 / -1; }
   `],
 })
 export class EventsComponent implements OnInit {
@@ -79,5 +82,9 @@ export class EventsComponent implements OnInit {
 
   ngOnInit() {
     this.api.getEvents().subscribe((events) => this.events.set(events));
+  }
+
+  getCoverUrl(event: EventSummary): string {
+    return `${environment.storageUrl}/thumbnails/${event.id}/${event.coverPhotoId}.jpg`;
   }
 }

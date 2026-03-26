@@ -20,7 +20,7 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
             <th>Date</th>
             <th>Lieu</th>
             <th>Prix</th>
-            <th>Publiee</th>
+            <th>Publiée</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -43,9 +43,9 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
                 </button>
               </td>
               <td class="actions">
-                <a [routerLink]="['/admin/events', event.id, 'edit']">Modifier</a>
-                <a [routerLink]="['/admin/events', event.id, 'upload']">Photos</a>
+                <a [routerLink]="['/admin/events', event.id]">Gérer</a>
                 <a [routerLink]="['/admin/events', event.id, 'tagger']">Tagger</a>
+                <button class="action-delete" (click)="deleteEvent(event)">Supprimer</button>
               </td>
             </tr>
           }
@@ -60,14 +60,23 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
     .table th, .table td {
       padding: 0.75rem;
       text-align: left;
-      border-bottom: 1px solid #222;
+      border-bottom: 1px solid #e5e7eb;
     }
-    .table th { color: #999; font-weight: 600; }
+    .table th { color: #6b7280; font-weight: 600; }
     .actions { display: flex; gap: 0.75rem; }
-    .actions a { color: #4a9eff; text-decoration: none; }
+    .actions a { color: #2563eb; text-decoration: none; }
+    .action-delete {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: inherit;
+      padding: 0;
+    }
+    .action-delete:hover { text-decoration: underline; }
     .btn-toggle {
-      background: #333;
-      color: #999;
+      background: #d1d5db;
+      color: #6b7280;
       border: none;
       padding: 4px 12px;
       border-radius: 4px;
@@ -92,5 +101,11 @@ export class EventListComponent implements OnInit {
     this.api.updateEvent(event.id, { isPublished: !event.isPublished }).subscribe(() => {
       this.loadEvents();
     });
+  }
+
+  deleteEvent(event: EventSummary) {
+    if (confirm(`Supprimer "${event.name}" ?`)) {
+      this.api.deleteEvent(event.id).subscribe(() => this.loadEvents());
+    }
   }
 }

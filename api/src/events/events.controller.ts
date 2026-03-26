@@ -29,6 +29,12 @@ export class EventsController {
   }
 
   @UseGuards(AdminGuard)
+  @Get('admin/events/:id')
+  findById(@Param('id') id: string) {
+    return this.eventsService.findById(id);
+  }
+
+  @UseGuards(AdminGuard)
   @Post('admin/events')
   create(@Body() dto: CreateEventDto) {
     return this.eventsService.create(dto);

@@ -93,6 +93,10 @@ export class ApiService {
     return this.http.get<EventSummary[]>(`${this.base}/admin/events`);
   }
 
+  getAdminEvent(id: string): Observable<EventSummary> {
+    return this.http.get<EventSummary>(`${this.base}/admin/events/${id}`);
+  }
+
   createEvent(data: any): Observable<EventSummary> {
     return this.http.post<EventSummary>(`${this.base}/admin/events`, data);
   }
@@ -120,6 +124,10 @@ export class ApiService {
 
   updateBibs(photoId: string, bibs: string[]): Observable<PhotoSummary> {
     return this.http.patch<PhotoSummary>(`${this.base}/admin/photos/${photoId}/bibs`, { bibs });
+  }
+
+  deletePhoto(photoId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/admin/photos/${photoId}`);
   }
 
   // Admin - Orders

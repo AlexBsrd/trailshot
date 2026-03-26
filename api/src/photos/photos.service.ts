@@ -111,6 +111,17 @@ export class PhotosService {
     return this.findById(photoId);
   }
 
+  async remove(id: string): Promise<void> {
+    const photo = await this.findById(id);
+    await Promise.all([
+      this.storage.delete(photo.originalKey),
+      this.storage.delete(photo.previewKey),
+      this.storage.delete(photo.thumbnailKey),
+    ]);
+    await this.bibRepo.delete({ photoId: id });
+    await this.photoRepo.remove(photo);
+  }
+
   async getPreviewUrl(id: string): Promise<string> {
     const photo = await this.findById(id);
     return this.storage.getPublicUrl(photo.previewKey);

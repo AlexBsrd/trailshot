@@ -15,11 +15,11 @@ export const routes: Routes = [
   {
     path: 'admin',
     canActivate: [adminGuard],
+    loadComponent: () => import('./admin/layout/admin-layout.component').then(m => m.AdminLayoutComponent),
     children: [
       { path: 'events', loadComponent: () => import('./admin/events/event-list/event-list.component').then(m => m.EventListComponent) },
       { path: 'events/new', loadComponent: () => import('./admin/events/event-form/event-form.component').then(m => m.EventFormComponent) },
-      { path: 'events/:id/edit', loadComponent: () => import('./admin/events/event-form/event-form.component').then(m => m.EventFormComponent) },
-      { path: 'events/:id/upload', loadComponent: () => import('./admin/photos/photo-upload/photo-upload.component').then(m => m.PhotoUploadComponent) },
+      { path: 'events/:id', loadComponent: () => import('./admin/events/event-detail-admin/event-detail-admin.component').then(m => m.EventDetailAdminComponent) },
       { path: 'events/:id/tagger', loadComponent: () => import('./admin/photos/speed-tagger/speed-tagger.component').then(m => m.SpeedTaggerComponent) },
       { path: 'orders', loadComponent: () => import('./admin/orders/order-list/order-list.component').then(m => m.OrderListComponent) },
       { path: '', redirectTo: 'events', pathMatch: 'full' },

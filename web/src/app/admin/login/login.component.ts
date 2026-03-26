@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
@@ -32,7 +32,7 @@ import { ApiService } from '../../core/services/api.service';
       min-height: 80vh;
     }
     .login-card {
-      background: #1a1a1a;
+      background: #fff;
       padding: 2rem;
       border-radius: 12px;
       width: 100%;
@@ -43,12 +43,18 @@ import { ApiService } from '../../core/services/api.service';
     .error { color: #ef4444; text-align: center; font-size: 0.875rem; }
   `],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private api = inject(ApiService);
   private router = inject(Router);
 
   username = '';
   password = '';
+
+  ngOnInit() {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('trailshot_token')) {
+      this.router.navigate(['/admin']);
+    }
+  }
   loading = signal(false);
   error = signal(false);
 

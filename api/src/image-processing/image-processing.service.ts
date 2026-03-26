@@ -7,18 +7,22 @@ export class ImageProcessingService {
   private readonly PREVIEW_WIDTH = 1200;
   private readonly THUMBNAIL_QUALITY = 80;
   private readonly PREVIEW_QUALITY = 85;
-  private readonly WATERMARK_TEXT = 'TRAILSHOT';
-  private readonly WATERMARK_OPACITY = 0.18;
+  private readonly WATERMARK_TEXT = 'trailshot.fr';
+  private readonly WATERMARK_OPACITY = 0.35;
+
+  private open(input: Buffer) {
+    return sharp(input, { failOn: 'none' });
+  }
 
   async generateThumbnail(input: Buffer): Promise<Buffer> {
-    return sharp(input)
+    return this.open(input)
       .resize(this.THUMBNAIL_WIDTH, null, { withoutEnlargement: true })
       .jpeg({ quality: this.THUMBNAIL_QUALITY })
       .toBuffer();
   }
 
   async generatePreview(input: Buffer, watermark: boolean): Promise<Buffer> {
-    const resized = await sharp(input)
+    const resized = await this.open(input)
       .resize(this.PREVIEW_WIDTH, null, { withoutEnlargement: true })
       .toBuffer({ resolveWithObject: true });
 
@@ -38,15 +42,16 @@ export class ImageProcessingService {
   }
 
   async getMetadata(input: Buffer): Promise<{ width: number; height: number }> {
-    const meta = await sharp(input).metadata();
+    const meta = await this.open(input).metadata();
     return { width: meta.width, height: meta.height };
   }
 
   private createTiledWatermarkSvg(width: number, height: number): string {
-    const fontSize = Math.max(20, Math.floor(width / 20));
-    const stepX = fontSize * 7;
+    const fontSize = Math.max(24, Math.floor(width / 16));
+    const stepX = fontSize * 8;
     const stepY = fontSize * 3;
     const opacity = this.WATERMARK_OPACITY;
+    const strokeWidth = Math.max(1, Math.floor(fontSize / 25));
 
     const diagonal = Math.sqrt(width * width + height * height);
     const offsetX = (diagonal - width) / 2;
@@ -55,6 +60,9 @@ export class ImageProcessingService {
     let texts = '';
     for (let y = -offsetY; y < height + offsetY; y += stepY) {
       for (let x = -offsetX; x < width + offsetX; x += stepX) {
+        // Dark stroke for visibility on light backgrounds
+        texts += `<text x="${x}" y="${y}" font-size="${fontSize}" fill="none" stroke="black" stroke-width="${strokeWidth}" opacity="${opacity * 0.6}" font-family="Arial, sans-serif" font-weight="bold">${this.WATERMARK_TEXT}</text>`;
+        // White fill for visibility on dark backgrounds
         texts += `<text x="${x}" y="${y}" font-size="${fontSize}" fill="white" opacity="${opacity}" font-family="Arial, sans-serif" font-weight="bold">${this.WATERMARK_TEXT}</text>`;
       }
     }

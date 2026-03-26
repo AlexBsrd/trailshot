@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Patch, Param, Query, Body,
+  Controller, Get, Post, Patch, Delete, Param, Query, Body,
   UseGuards, UseInterceptors, UploadedFiles,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -48,5 +48,11 @@ export class PhotosController {
   @Patch('admin/photos/:id/bibs')
   updateBibs(@Param('id') id: string, @Body() dto: UpdateBibsDto) {
     return this.photosService.updateBibs(id, dto.bibs);
+  }
+
+  @UseGuards(AdminGuard)
+  @Delete('admin/photos/:id')
+  remove(@Param('id') id: string) {
+    return this.photosService.remove(id);
   }
 }
