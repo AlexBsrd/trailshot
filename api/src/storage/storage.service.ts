@@ -11,13 +11,13 @@ export class StorageService {
   private readonly bucket: string;
 
   constructor(private config: ConfigService) {
-    this.bucket = this.config.get('s3.bucket');
+    this.bucket = this.config.get<string>('s3.bucket')!;
     this.client = new S3Client({
-      endpoint: this.config.get('s3.endpoint'),
-      region: this.config.get('s3.region'),
+      endpoint: this.config.get<string>('s3.endpoint'),
+      region: this.config.get<string>('s3.region'),
       credentials: {
-        accessKeyId: this.config.get('s3.accessKeyId'),
-        secretAccessKey: this.config.get('s3.secretAccessKey'),
+        accessKeyId: this.config.get<string>('s3.accessKeyId')!,
+        secretAccessKey: this.config.get<string>('s3.secretAccessKey')!,
       },
       forcePathStyle: true, // Required for MinIO
     });

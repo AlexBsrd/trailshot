@@ -12,6 +12,7 @@ import { StorageModule } from './storage/storage.module';
 import { ImageProcessingModule } from './image-processing/image-processing.module';
 import { EventsModule } from './events/events.module';
 import { PhotosModule } from './photos/photos.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { PhotosModule } from './photos/photos.module';
     ImageProcessingModule,
     EventsModule,
     PhotosModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}
