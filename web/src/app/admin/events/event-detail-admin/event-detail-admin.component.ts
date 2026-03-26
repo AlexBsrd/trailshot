@@ -195,37 +195,67 @@ import { environment } from '../../../../environments/environment';
     </div>
   `,
   styles: [`
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
     .page { padding: 2rem; max-width: 1100px; }
-    .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-    .back { color: #6b7280; text-decoration: none; font-size: 0.85rem; }
-    .back:hover { color: #2563eb; }
-    .page-header h1 { margin: 0.25rem 0 0.15rem; }
-    .meta { color: #6b7280; font-size: 0.9rem; }
-    .btn-publish { background: #22c55e; color: #fff; }
-    .btn-unpublish { background: #f59e0b; color: #fff; }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+    .back {
+      color: $color-text-muted;
+      text-decoration: none;
+      font-size: $font-size-small;
+      transition: color 0.15s;
+    }
+    .back:hover { color: $color-forest-light; }
+    .page-header h1 {
+      margin: 0.25rem 0 0.15rem;
+      font-family: $font-family;
+      font-weight: $font-heading-weight;
+      color: $color-forest;
+    }
+    .meta { color: $color-text-muted; font-size: $font-size-body; }
+
+    .header-actions .btn-publish {
+      background: $color-success;
+      color: $color-white;
+    }
+    .header-actions .btn-unpublish {
+      background: $color-warning;
+      color: $color-white;
+    }
 
     /* Tabs */
     .tabs {
       display: flex;
       gap: 0;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid #d1d5db;
       margin-bottom: 1.5rem;
     }
     .tabs button {
       background: none;
       border: none;
       padding: 0.6rem 1.25rem;
-      font-size: 0.95rem;
-      color: #6b7280;
+      font-size: $font-size-body;
+      color: $color-text-muted;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
       transition: color 0.15s, border-color 0.15s;
     }
-    .tabs button:hover { color: #1a1a1a; }
-    .tabs button.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+    .tabs button:hover { color: $color-text; }
+    .tabs button.active {
+      color: $color-forest;
+      border-bottom-color: $color-forest-light;
+      font-weight: 600;
+    }
 
-    .tab-content { animation: fadeIn 0.15s; }
+    .tab-content { animation: fadeIn 0.15s ease-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     /* Details form */
@@ -233,10 +263,15 @@ import { environment } from '../../../../environments/environment';
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
     .form-group { display: flex; flex-direction: column; gap: 0.25rem; }
     .form-group.full { grid-column: 1 / -1; }
-    .form-group label { color: #4b5563; font-size: 0.9rem; }
+    .form-group label { color: $color-text; font-size: $font-size-small; }
     .checkbox-label { flex-direction: row !important; align-items: center; gap: 0.5rem; cursor: pointer; }
     .form-actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
-    .saved-msg { color: #22c55e; font-size: 0.9rem; }
+    .saved-msg { color: $color-success; font-size: $font-size-body; }
+
+    :host .btn-primary {
+      background: $color-forest;
+      color: $color-cream;
+    }
 
     /* Photos tab */
     .photos-toolbar {
@@ -245,25 +280,30 @@ import { environment } from '../../../../environments/environment';
       gap: 0.5rem;
       margin-bottom: 1rem;
       padding: 0.5rem 0.75rem;
-      background: #fff;
-      border-radius: 6px;
-      border: 1px solid #e5e7eb;
+      background: $color-white;
+      border-radius: $radius-sm;
+      border: 1px solid $color-sand-light;
     }
-    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.85rem; }
-    .btn-danger { background: #ef4444; color: #fff; }
+    .photos-toolbar a {
+      color: $color-forest-light;
+      transition: color 0.15s;
+    }
+    .photos-toolbar a:hover { color: $color-forest; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: $font-size-small; }
+    .btn-danger { background: $color-danger; color: $color-white; }
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 0.5rem;
     }
     .photo-card {
-      background: #fff;
-      border-radius: 6px;
+      background: $color-white;
+      border-radius: $radius-sm;
       overflow: hidden;
       border: 2px solid transparent;
       transition: border-color 0.15s;
     }
-    .photo-card.selected { border-color: #2563eb; }
+    .photo-card.selected { border-color: $color-forest-light; }
     .photo-img { position: relative; cursor: pointer; }
     .photo-img img { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; }
     .check {
@@ -271,58 +311,119 @@ import { environment } from '../../../../environments/environment';
       top: 4px; left: 4px;
       width: 22px; height: 22px;
       border-radius: 50%;
-      background: #fff;
+      background: $color-white;
       border: 2px solid #d1d5db;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 0.7rem;
       color: transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
-    .check.visible { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .check.visible {
+      background: $color-forest-light;
+      border-color: $color-forest-light;
+      color: $color-white;
+    }
     .photo-meta { display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0.5rem; }
     .bibs { display: flex; gap: 3px; flex-wrap: wrap; }
-    .bib-tag { background: #eef2ff; color: #2563eb; padding: 0 5px; border-radius: 3px; font-size: 0.7rem; font-weight: 600; }
-    .no-bib { color: #d1d5db; font-size: 0.75rem; }
+    .bib-tag {
+      background: rgba(74, 123, 90, 0.1);
+      color: $color-forest-light;
+      padding: 0 5px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .no-bib { color: $color-sand-light; font-size: $font-size-xs; }
     .photo-actions { display: flex; gap: 2px; }
-    .icon-btn { background: none; border: none; cursor: pointer; padding: 2px; border-radius: 4px; font-size: 0.85rem; }
-    .icon-btn:hover { background: #f3f4f6; }
-    .icon-btn.danger:hover { background: #fef2f2; }
-    .icon-btn.active-cover { background: #eef2ff; }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      font-size: $font-size-small;
+      transition: background 0.15s;
+    }
+    .icon-btn:hover { background: rgba(74, 123, 90, 0.08); }
+    .icon-btn.danger:hover { background: rgba(184, 64, 64, 0.08); }
+    .icon-btn.active-cover { background: rgba(74, 123, 90, 0.1); }
     .cover-badge {
-      background: #2563eb;
-      color: #fff;
+      background: $color-sand-light;
+      color: $color-forest;
       text-align: center;
       font-size: 0.7rem;
       font-weight: 600;
       padding: 2px 0;
     }
 
+    /* Preview button overlay */
+    .icon-btn[title="Voir"] {
+      background: rgba(255, 255, 255, 0.8);
+      color: $color-forest;
+      transition: background 0.15s;
+    }
+    .icon-btn[title="Voir"]:hover {
+      background: $color-white;
+    }
+
     /* Upload tab */
     .dropzone {
-      border: 2px dashed #d1d5db;
-      border-radius: 12px;
+      border: 2px dashed $color-sand;
+      border-radius: $radius-lg;
       padding: 3rem;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .dropzone:hover, .dropzone.dragging { border-color: #2563eb; background: rgba(37,99,235,0.03); }
-    .hint { color: #9ca3af; font-size: 0.85rem; margin-top: 0.25rem; }
+    .dropzone:hover, .dropzone.dragging {
+      border-color: $color-forest-light;
+      background: rgba(74, 123, 90, 0.04);
+    }
+    .hint { color: $color-text-muted; font-size: $font-size-small; margin-top: 0.25rem; }
     .upload-info { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
-    .uploading { color: #2563eb; margin-top: 1rem; }
+    .uploading { color: $color-forest-light; margin-top: 1rem; }
     .upload-success { margin-top: 1rem; }
-    .upload-success p { color: #22c55e; margin-bottom: 0.75rem; }
+    .upload-success p { color: $color-success; margin-bottom: 0.75rem; }
     .upload-actions { display: flex; gap: 0.5rem; }
 
-    .empty { text-align: center; padding: 3rem; color: #6b7280; }
+    .empty { text-align: center; padding: 3rem; color: $color-text-muted; }
     .empty .btn { margin-top: 0.75rem; }
 
     /* Lightbox */
-    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(27, 58, 45, 0.85);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      animation: fadeIn 0.15s ease-out;
+    }
     .lightbox-body { position: relative; max-width: 90vw; max-height: 90vh; }
-    .lightbox-body img { max-width: 100%; max-height: 85vh; border-radius: 8px; display: block; }
-    .lightbox-close { position: absolute; top: -12px; right: -12px; background: #fff; color: #1a1a1a; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .lightbox-body img { max-width: 100%; max-height: 85vh; border-radius: $radius-sm; display: block; }
+    .lightbox-close {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      background: $color-white;
+      color: $color-forest;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: $shadow-card;
+      transition: box-shadow 0.15s;
+    }
+    .lightbox-close:hover { box-shadow: $shadow-elevated; }
   `],
 })
 export class EventDetailAdminComponent implements OnInit {

@@ -52,13 +52,47 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
     </div>
   `,
   styles: [`
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
     .event-form-page { padding: 2rem; max-width: 600px; }
+
+    h1 {
+      font-family: $font-family;
+      font-weight: $font-heading-weight;
+      color: $color-forest;
+      margin-bottom: 1.25rem;
+    }
+
     form { display: flex; flex-direction: column; gap: 0.75rem; }
-    label { color: #4b5563; }
+
+    label {
+      color: $color-text;
+      font-size: $font-size-small;
+    }
+
     .checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+
     .price-row { display: flex; gap: 1rem; }
     .price-row > div { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
+
     .form-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+
+    :host .btn-primary {
+      background: $color-forest;
+      color: $color-cream;
+    }
+
+    :host .btn-secondary {
+      background: transparent;
+      color: $color-text-muted;
+      border: none;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    :host .btn-secondary:hover {
+      color: $color-text;
+    }
   `],
 })
 export class EventFormComponent implements OnInit {

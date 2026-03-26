@@ -55,18 +55,21 @@ import { environment } from '../../../../environments/environment';
     </div>
   `,
   styles: [`
-    .tagger { padding: 1rem; display: flex; flex-direction: column; height: calc(100vh - 80px); }
+    @use 'tokens' as *;
+    @use 'animations' as *;
+
+    .tagger { padding: 1rem; display: flex; flex-direction: column; height: calc(100vh - 80px); background: $color-cream; }
     .tagger-header {
       display: flex;
       align-items: center;
       gap: 1rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid rgba(27, 58, 45, 0.1);
       flex-wrap: wrap;
     }
-    .tagger-header h2 { margin: 0; }
-    .progress-text { color: #2563eb; }
-    .hints { color: #9ca3af; font-size: 0.8rem; margin-left: auto; }
+    .tagger-header h2 { margin: 0; color: $color-forest; font-family: $font-family; font-weight: $font-heading-weight; }
+    .progress-text { color: $color-success; }
+    .hints { color: $color-text-muted; font-size: 0.8rem; margin-left: auto; }
     .main-photo {
       flex: 1;
       display: flex;
@@ -80,14 +83,27 @@ import { environment } from '../../../../environments/environment';
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      border-radius: 4px;
+      border-radius: $radius-sm;
     }
     .bib-input-row {
       display: flex;
       gap: 0.5rem;
       padding: 0.75rem 0;
     }
-    .bib-input { flex: 1; font-size: 1.1rem; }
+    .bib-input {
+      flex: 1;
+      font-size: 1.1rem;
+      &:focus {
+        outline: none;
+        border-color: $color-forest-light;
+        box-shadow: 0 0 0 2px rgba(74, 123, 90, 0.15);
+      }
+    }
+    .bib-input-row .btn-primary {
+      background: $color-forest;
+      color: $color-cream;
+      border: none;
+    }
     .thumbnail-strip {
       display: flex;
       gap: 4px;
@@ -98,7 +114,7 @@ import { environment } from '../../../../environments/environment';
     .strip-thumb {
       width: 60px;
       height: 45px;
-      border-radius: 4px;
+      border-radius: $radius-sm;
       overflow: hidden;
       cursor: pointer;
       border: 2px solid transparent;
@@ -106,8 +122,8 @@ import { environment } from '../../../../environments/environment';
       opacity: 0.5;
       transition: opacity 0.2s, border-color 0.2s;
     }
-    .strip-thumb.current { border-color: #2563eb; opacity: 1; }
-    .strip-thumb.tagged { border-color: #22c55e; opacity: 0.8; }
+    .strip-thumb.current { border-color: $color-sand-light; opacity: 1; }
+    .strip-thumb.tagged { border-color: $color-success; opacity: 0.8; }
     .strip-thumb img { width: 100%; height: 100%; object-fit: cover; }
   `],
 })
