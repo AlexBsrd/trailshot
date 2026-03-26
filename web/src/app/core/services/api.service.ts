@@ -29,6 +29,7 @@ export interface PhotoSummary {
 
 export interface OrderResult {
   id: string;
+  orderNumber: number;
   downloadToken: string;
   totalCents: number;
   status: string;
@@ -133,5 +134,13 @@ export class ApiService {
   // Admin - Orders
   getAdminOrders(): Observable<any[]> {
     return this.http.get<any[]>(`${this.base}/admin/orders`);
+  }
+
+  getAdminOrder(id: string): Observable<any> {
+    return this.http.get<any>(`${this.base}/admin/orders/${id}`);
+  }
+
+  resendOrderEmail(id: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/admin/orders/${id}/resend`, {});
   }
 }

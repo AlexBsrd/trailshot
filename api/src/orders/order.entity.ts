@@ -1,5 +1,5 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column, CreateDateColumn,
+  Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Generated,
   ManyToOne, OneToMany, JoinColumn,
 } from 'typeorm';
 import { Event } from '../events/event.entity';
@@ -9,6 +9,10 @@ import { OrderPhoto } from './order-photo.entity';
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ name: 'order_number', type: 'integer', unique: true })
+  @Generated('increment')
+  orderNumber: number;
 
   @Column({ name: 'event_id' })
   eventId: string;

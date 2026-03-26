@@ -118,10 +118,21 @@ import { environment } from '../../../../environments/environment';
                     <div class="photo-img" (click)="toggleSelectPhoto(photo.id)">
                       <img [src]="getThumbnailUrl(photo)" alt="" loading="lazy" />
                       <div class="check" [class.visible]="selected().has(photo.id)">✓</div>
+                      @if (event()!.coverPhotoId === photo.id) {
+                        <div class="cover-badge">Couverture</div>
+                      }
+                      <div class="photo-overlay" (click)="$event.stopPropagation()">
+                        <button class="overlay-btn" (click)="setCoverPhoto(photo.id)" [class.active]="event()!.coverPhotoId === photo.id" title="Définir comme couverture">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                        </button>
+                        <button class="overlay-btn" (click)="previewPhoto.set(photo)" title="Voir en grand">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        </button>
+                        <button class="overlay-btn overlay-btn--danger" (click)="deleteOne(photo)" title="Supprimer">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                      </div>
                     </div>
-                    @if (event()!.coverPhotoId === photo.id) {
-                      <div class="cover-badge">Couverture</div>
-                    }
                     <div class="photo-meta">
                       <div class="bibs">
                         @if (photo.bibs && photo.bibs.length > 0) {
@@ -131,11 +142,6 @@ import { environment } from '../../../../environments/environment';
                         } @else {
                           <span class="no-bib">—</span>
                         }
-                      </div>
-                      <div class="photo-actions">
-                        <button class="icon-btn" (click)="setCoverPhoto(photo.id)" title="Définir comme couverture" [class.active-cover]="event()!.coverPhotoId === photo.id">🖼</button>
-                        <button class="icon-btn" (click)="previewPhoto.set(photo)" title="Voir">🔍</button>
-                        <button class="icon-btn danger" (click)="deleteOne(photo)" title="Supprimer">🗑</button>
                       </div>
                     </div>
                   </div>
@@ -325,48 +331,60 @@ import { environment } from '../../../../environments/environment';
       border-color: $color-forest-light;
       color: $color-white;
     }
-    .photo-meta { display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0.5rem; }
+    .photo-meta { padding: 0.35rem 0.5rem; }
     .bibs { display: flex; gap: 3px; flex-wrap: wrap; }
     .bib-tag {
       background: rgba(74, 123, 90, 0.1);
       color: $color-forest-light;
-      padding: 0 5px;
+      padding: 1px 6px;
       border-radius: 3px;
       font-size: 0.7rem;
       font-weight: 600;
     }
     .no-bib { color: $color-sand-light; font-size: $font-size-xs; }
-    .photo-actions { display: flex; gap: 2px; }
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 2px;
-      border-radius: 4px;
-      font-size: $font-size-small;
-      transition: background 0.15s;
-    }
-    .icon-btn:hover { background: rgba(74, 123, 90, 0.08); }
-    .icon-btn.danger:hover { background: rgba(184, 64, 64, 0.08); }
-    .icon-btn.active-cover { background: rgba(74, 123, 90, 0.1); }
     .cover-badge {
-      background: $color-sand-light;
-      color: $color-forest;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(166, 139, 91, 0.85);
+      color: $color-white;
       text-align: center;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 600;
       padding: 2px 0;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
 
-    /* Preview button overlay */
-    .icon-btn[title="Voir"] {
-      background: rgba(255, 255, 255, 0.8);
+    /* Action overlay on hover */
+    .photo-overlay {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      display: flex;
+      gap: 3px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .photo-card:hover .photo-overlay { opacity: 1; }
+    .overlay-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: $radius-sm;
+      border: none;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.9);
       color: $color-forest;
-      transition: background 0.15s;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s, color 0.15s;
     }
-    .icon-btn[title="Voir"]:hover {
-      background: $color-white;
-    }
+    .overlay-btn:hover { background: $color-white; }
+    .overlay-btn.active { background: $color-forest-light; color: $color-white; }
+    .overlay-btn--danger:hover { background: $color-danger; color: $color-white; }
 
     /* Upload tab */
     .dropzone {

@@ -48,9 +48,17 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
                 </button>
               </td>
               <td class="actions">
-                <a [routerLink]="['/admin/events', event.id]">Gérer</a>
-                <a [routerLink]="['/admin/events', event.id, 'tagger']">Tagger</a>
-                <button class="action-delete" (click)="deleteEvent(event)">Supprimer</button>
+                <a [routerLink]="['/admin/events', event.id]" class="action-btn action-btn--primary">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Gérer
+                </a>
+                <a [routerLink]="['/admin/events', event.id, 'tagger']" class="action-btn action-btn--secondary">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                  Tagger
+                </a>
+                <button class="action-btn action-btn--danger" (click)="deleteEvent(event)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
               </td>
             </tr>
           }
@@ -100,29 +108,47 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
       background: rgba(166, 139, 91, 0.08);
     }
 
-    .actions { display: flex; gap: 0.75rem; }
-    .actions a {
-      color: $color-forest-light;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.15s;
-    }
-    .actions a:hover {
-      color: $color-forest;
-    }
-
-    .action-delete {
-      background: none;
+    .actions { display: flex; gap: 0.4rem; align-items: center; }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: $radius-sm;
       border: none;
-      color: $color-danger;
+      font-size: $font-size-xs;
+      font-family: $font-family;
+      font-weight: 600;
       cursor: pointer;
-      font-size: inherit;
-      padding: 0;
-      font-weight: 500;
-      transition: color 0.15s;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
     }
-    .action-delete:hover {
-      text-decoration: underline;
+    .action-btn svg { flex-shrink: 0; }
+    .action-btn--primary {
+      background: rgba(74, 123, 90, 0.1);
+      color: $color-forest-light;
+    }
+    .action-btn--primary:hover {
+      background: $color-forest-light;
+      color: $color-white;
+    }
+    .action-btn--secondary {
+      background: rgba(166, 139, 91, 0.1);
+      color: $color-sand;
+    }
+    .action-btn--secondary:hover {
+      background: $color-sand;
+      color: $color-white;
+    }
+    .action-btn--danger {
+      background: rgba(184, 64, 64, 0.08);
+      color: $color-danger;
+      padding: 0.3rem;
+    }
+    .action-btn--danger:hover {
+      background: $color-danger;
+      color: $color-white;
     }
 
     :host .btn-primary {

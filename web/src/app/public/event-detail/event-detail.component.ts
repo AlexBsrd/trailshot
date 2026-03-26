@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService, EventSummary, PhotoSummary } from '../../core/services/api.service';
@@ -64,28 +64,59 @@ import { environment } from '../../../environments/environment';
             <div
               class="photo-card"
               [class.selected]="cart.isSelected(photo.id)"
-              (click)="togglePhoto(photo)"
+              (click)="openPreview(photo, $event)"
             >
               <img [src]="getThumbnailUrl(photo)" [alt]="'Photo'" loading="lazy" />
-              <button class="preview-btn" (click)="openPreview(photo, $event)" title="Prévisualiser">
-                &#128269;
-              </button>
-              @if (cart.isSelected(photo.id)) {
-                <div class="selected-overlay">&#10003;</div>
-              }
               @if (!event()!.isFree) {
                 <div class="photo-price">{{ formatPrice(event()!.priceSingle) }}</div>
+              } @else {
+                <div class="photo-price photo-price--free">Gratuit</div>
               }
+              <button
+                class="select-btn"
+                [class.select-btn--active]="cart.isSelected(photo.id)"
+                (click)="toggleCart(photo, $event)"
+                title="Sélectionner"
+              >
+                @if (cart.isSelected(photo.id)) {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                }
+              </button>
             </div>
           }
         </div>
 
         @if (previewPhoto()) {
           <div class="lightbox" (click)="closePreview()">
+            @if (prevPreview()) {
+              <button class="lightbox-arrow lightbox-arrow--prev" (click)="previewPrev($event)" title="Précédente">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+            }
             <div class="lightbox-content" (click)="$event.stopPropagation()">
               <button class="lightbox-close" (click)="closePreview()">&times;</button>
               <img [src]="getPreviewUrl(previewPhoto()!)" alt="Prévisualisation" />
+              <div class="lightbox-footer">
+                <span class="lightbox-counter">{{ previewIndex() + 1 }} / {{ photos().length }}</span>
+                <button class="lightbox-action" [class.in-cart]="cart.isSelected(previewPhoto()!.id)" (click)="toggleCart(previewPhoto()!)">
+                  @if (cart.isSelected(previewPhoto()!.id)) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Sélectionnée
+                  } @else if (event()!.isFree) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Sélectionner
+                  } @else {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    Ajouter — {{ formatPrice(event()!.priceSingle) }}
+                  }
+                </button>
+              </div>
             </div>
+            @if (nextPreview()) {
+              <button class="lightbox-arrow lightbox-arrow--next" (click)="previewNext($event)" title="Suivante">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            }
           </div>
         }
 
@@ -106,6 +137,8 @@ import { environment } from '../../../environments/environment';
               <span class="sticky-total">
                 {{ cart.isPackMode() ? formatPrice(event()!.pricePack) : formatPrice(cart.count() * event()!.priceSingle) }}
               </span>
+            } @else {
+              <span class="sticky-total sticky-total--free">Gratuit</span>
             }
             <a routerLink="/order" class="btn-order">Commander</a>
           </div>
@@ -168,6 +201,7 @@ import { environment } from '../../../environments/environment';
       background-position: center;
       filter: none;
       margin-bottom: 1.5rem;
+      overflow: hidden;
 
       &::before {
         content: '';
@@ -306,12 +340,24 @@ import { environment } from '../../../environments/environment';
       border: 3px solid transparent;
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(27, 58, 45, 0.35);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+        z-index: 1;
+      }
+
       &:hover {
         transform: scale(1.02);
         box-shadow: $shadow-elevated;
       }
       &.selected {
-        border-color: $color-sand-light;
+        border-color: $color-forest-light;
+        &::after { opacity: 1; }
       }
     }
     .photo-card img {
@@ -320,20 +366,43 @@ import { environment } from '../../../environments/environment';
       aspect-ratio: 4 / 3;
       object-fit: cover;
     }
-    .selected-overlay {
+    .select-btn {
       position: absolute;
       top: 8px;
       right: 8px;
-      background: $color-sand-light;
-      color: $color-forest;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
+      border: 2.5px solid rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.25);
+      color: $color-white;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 0.85rem;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s, opacity 0.15s;
+      opacity: 0;
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+
+      .photo-card:hover & { opacity: 1; }
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.4);
+        transform: scale(1.1);
+      }
+
+      &--active {
+        opacity: 1;
+        background: $color-forest-light;
+        border-color: $color-forest-light;
+        color: $color-white;
+
+        &:hover {
+          background: $color-forest;
+          border-color: $color-forest;
+        }
+      }
     }
     .photo-price {
       position: absolute;
@@ -346,30 +415,17 @@ import { environment } from '../../../environments/environment';
       border-radius: $radius-sm;
       font-size: $font-size-xs;
       color: $color-cream;
+
+      &--free {
+        background: $color-forest-light;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
     }
-
-    /* ── Preview Button ── */
-    .preview-btn {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(255, 255, 255, 0.8);
-      color: $color-forest;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-      transition: background 0.2s;
-      opacity: 0;
-
-      .photo-card:hover & { opacity: 1; }
-      &:hover { background: white; }
+    .sticky-total--free {
+      color: $color-sand-light;
+      font-style: italic;
     }
 
     /* ── Lightbox ── */
@@ -422,6 +478,70 @@ import { environment } from '../../../environments/environment';
       transition: opacity 0.2s;
 
       &:hover { opacity: 0.7; }
+    }
+    .lightbox-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.25);
+      color: $color-white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      z-index: 1;
+      backdrop-filter: blur(4px);
+
+      &:hover { background: rgba(255, 255, 255, 0.4); }
+    }
+    .lightbox-arrow--prev { left: 1rem; }
+    .lightbox-arrow--next { right: 1rem; }
+    .lightbox-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.75rem;
+      gap: 1rem;
+    }
+    .lightbox-counter {
+      color: rgba($color-cream, 0.7);
+      font-size: $font-size-small;
+    }
+    .lightbox-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: $color-sand-light;
+      color: $color-forest;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      font-size: $font-size-small;
+      font-weight: $font-subheading-weight;
+      font-family: $font-family;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+
+      &:hover { opacity: 0.9; }
+      &.in-cart {
+        background: rgba(255, 255, 255, 0.15);
+        color: $color-cream;
+      }
+    }
+    @media (max-width: $breakpoint-sm) {
+      .lightbox-arrow { width: 40px; height: 40px; }
+      .lightbox-arrow--prev { left: 0.5rem; }
+      .lightbox-arrow--next { right: 0.5rem; }
+    }
+
+    @media (hover: none) {
+      .select-btn { opacity: 1; }
     }
 
     /* ── Sticky Cart Bar ── */
@@ -496,6 +616,33 @@ export class EventDetailComponent implements OnInit {
   activeBib = signal('');
   previewPhoto = signal<PhotoSummary | null>(null);
   bibInput = '';
+  private lastSelectedIndex = -1;
+
+  previewIndex = computed(() => {
+    const p = this.previewPhoto();
+    return p ? this.photos().findIndex(ph => ph.id === p.id) : -1;
+  });
+  prevPreview = computed(() => {
+    const idx = this.previewIndex();
+    return idx > 0 ? this.photos()[idx - 1] : null;
+  });
+  nextPreview = computed(() => {
+    const idx = this.previewIndex();
+    const all = this.photos();
+    return idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+  });
+
+  @HostListener('window:keydown', ['$event'])
+  onKeydown(e: KeyboardEvent) {
+    if (!this.previewPhoto()) return;
+    if (e.key === 'ArrowLeft' && this.prevPreview()) {
+      this.previewPhoto.set(this.prevPreview());
+    } else if (e.key === 'ArrowRight' && this.nextPreview()) {
+      this.previewPhoto.set(this.nextPreview());
+    } else if (e.key === 'Escape') {
+      this.closePreview();
+    }
+  }
 
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug')!;
@@ -503,6 +650,13 @@ export class EventDetailComponent implements OnInit {
 
     this.api.getEvent(slug).subscribe((event) => {
       this.event.set(event);
+      this.cart.setEvent({
+        name: event.name,
+        slug: event.slug,
+        isFree: event.isFree,
+        priceSingle: event.priceSingle,
+        pricePack: event.pricePack,
+      });
       if (bib) {
         this.bibInput = bib;
         this.activeBib.set(bib);
@@ -544,30 +698,55 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
-  togglePhoto(photo: PhotoSummary) {
-    if (this.event()?.isFree) {
-      this.router.navigate(['/events', this.route.snapshot.paramMap.get('slug'), 'photos', photo.id]);
+  toggleCart(photo: PhotoSummary, event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    const all = this.photos();
+    const clickedIndex = all.findIndex(p => p.id === photo.id);
+
+    if (event?.shiftKey && this.lastSelectedIndex >= 0 && clickedIndex !== this.lastSelectedIndex) {
+      const from = Math.min(this.lastSelectedIndex, clickedIndex);
+      const to = Math.max(this.lastSelectedIndex, clickedIndex);
+      for (let i = from; i <= to; i++) {
+        if (!this.cart.isSelected(all[i].id)) {
+          this.cart.toggle(all[i].id, all[i].eventId, all[i].thumbnailKey);
+        }
+      }
     } else {
-      this.cart.toggle(photo.id, photo.eventId);
+      this.cart.toggle(photo.id, photo.eventId, photo.thumbnailKey);
     }
+
+    this.lastSelectedIndex = clickedIndex;
   }
 
   selectPack() {
-    const ids = this.photos().map((p) => p.id);
+    const photos = this.photos();
+    const ids = photos.map((p) => p.id);
+    const keys = photos.map((p) => p.thumbnailKey);
     const eventId = this.event()?.id;
     if (eventId) {
-      this.cart.selectPack(ids, eventId);
+      this.cart.selectPack(ids, eventId, keys);
       this.router.navigate(['/order']);
     }
   }
 
-  openPreview(photo: PhotoSummary, event: MouseEvent) {
-    event.stopPropagation();
+  openPreview(photo: PhotoSummary, event?: MouseEvent) {
     this.previewPhoto.set(photo);
   }
 
   closePreview() {
     this.previewPhoto.set(null);
+  }
+
+  previewPrev(event: MouseEvent) {
+    event.stopPropagation();
+    const prev = this.prevPreview();
+    if (prev) this.previewPhoto.set(prev);
+  }
+
+  previewNext(event: MouseEvent) {
+    event.stopPropagation();
+    const next = this.nextPreview();
+    if (next) this.previewPhoto.set(next);
   }
 
   getCoverUrl(event: EventSummary): string {

@@ -2,14 +2,22 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './event.entity';
+import { Order } from '../orders/order.entity';
+import { OrderPhoto } from '../orders/order-photo.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { PhotosService } from '../photos/photos.service';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectRepository(Event)
     private repo: Repository<Event>,
+    @InjectRepository(Order)
+    private orderRepo: Repository<Order>,
+    @InjectRepository(OrderPhoto)
+    private orderPhotoRepo: Repository<OrderPhoto>,
+    private photosService: PhotosService,
   ) {}
 
   async findAll(): Promise<Event[]> {
@@ -57,6 +65,25 @@ export class EventsService {
 
   async remove(id: string): Promise<void> {
     const event = await this.findById(id);
+
+    // Delete order_photos and orders for this event
+    const orders = await this.orderRepo.find({ where: { eventId: id } });
+    if (orders.length > 0) {
+      const orderIds = orders.map((o) => o.id);
+      await this.orderPhotoRepo
+        .createQueryBuilder()
+        .delete()
+        .where('order_id IN (:...orderIds)', { orderIds })
+        .execute();
+      await this.orderRepo.remove(orders);
+    }
+
+    // Delete photos (including S3 files and bibs)
+    const photos = await this.photosService.findByEventForAdmin(id);
+    for (const photo of photos) {
+      await this.photosService.remove(photo.id);
+    }
+
     await this.repo.remove(event);
   }
 

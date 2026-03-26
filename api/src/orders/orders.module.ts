@@ -8,12 +8,14 @@ import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { StorageModule } from '../storage/storage.module';
 import { AuthModule } from '../auth/auth.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderPhoto, Event, Photo]),
     StorageModule,
     AuthModule,
+    MailModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

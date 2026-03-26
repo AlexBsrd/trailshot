@@ -70,7 +70,7 @@ export class PhotosService {
 
       const meta = await this.imageProcessing.getMetadata(file.buffer);
       const thumbnail = await this.imageProcessing.generateThumbnail(file.buffer);
-      const preview = await this.imageProcessing.generatePreview(file.buffer, !event.isFree);
+      const preview = await this.imageProcessing.generatePreview(file.buffer, true);
 
       await Promise.all([
         this.storage.upload(originalKey, file.buffer, 'image/jpeg'),

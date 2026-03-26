@@ -30,11 +30,38 @@ export class OrdersController {
     return this.ordersService.streamZip(id, token, res);
   }
 
+  @Get('orders/:id/receipt')
+  async receipt(
+    @Param('id') id: string,
+    @Query('token') token: string,
+    @Res() res: Response,
+  ) {
+    const pdf = await this.ordersService.getReceipt(id, token);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="trailshot-recu-${id.slice(0, 8)}.pdf"`,
+      'Content-Length': pdf.length,
+    });
+    res.send(pdf);
+  }
+
   // Admin
   @UseGuards(AdminGuard)
   @Get('admin/orders')
   findAll() {
     return this.ordersService.findAll();
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('admin/orders/:id')
+  findOne(@Param('id') id: string) {
+    return this.ordersService.findOneAdmin(id);
+  }
+
+  @UseGuards(AdminGuard)
+  @Post('admin/orders/:id/resend')
+  resend(@Param('id') id: string) {
+    return this.ordersService.resendDownloadEmail(id);
   }
 
   @UseGuards(AdminGuard)
