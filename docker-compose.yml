@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: trailshot
+      POSTGRES_USER: trailshot
+      POSTGRES_PASSWORD: trailshot_dev
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+
+  minio-init:
+    image: minio/minio
+    depends_on:
+      - minio
+    entrypoint: /bin/sh
+    command: -c "sleep 3 && mc alias set local http://minio:9000 minioadmin minioadmin && mc mb --ignore-existing local/trailshot && mc anonymous set download local/trailshot/previews && mc anonymous set download local/trailshot/thumbnails"
+
+volumes:
+  pgdata:
+  miniodata:
