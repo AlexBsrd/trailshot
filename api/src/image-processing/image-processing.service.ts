@@ -8,10 +8,10 @@ export class ImageProcessingService {
   private readonly THUMBNAIL_QUALITY = 80;
   private readonly PREVIEW_QUALITY = 85;
   private readonly WATERMARK_TEXT = 'trailshot.fr';
-  private readonly WATERMARK_OPACITY = 0.35;
+  private readonly WATERMARK_OPACITY = 0.5;
 
   private open(input: Buffer) {
-    return sharp(input, { failOn: 'none' });
+    return sharp(input, { failOn: 'none' }).rotate();
   }
 
   async generateThumbnail(input: Buffer): Promise<Buffer> {
@@ -47,9 +47,9 @@ export class ImageProcessingService {
   }
 
   private createTiledWatermarkSvg(width: number, height: number): string {
-    const fontSize = Math.max(24, Math.floor(width / 16));
-    const stepX = fontSize * 8;
-    const stepY = fontSize * 3;
+    const fontSize = Math.max(28, Math.floor(width / 14));
+    const stepX = fontSize * 5;
+    const stepY = fontSize * 2;
     const opacity = this.WATERMARK_OPACITY;
     const strokeWidth = Math.max(1, Math.floor(fontSize / 25));
 

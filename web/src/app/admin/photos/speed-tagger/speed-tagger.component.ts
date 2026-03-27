@@ -1,5 +1,5 @@
-import { Component, inject, signal, computed, HostListener, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, signal, computed, effect, HostListener, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService, PhotoSummary, EventSummary } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
@@ -7,21 +7,29 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-speed-tagger',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   template: `
     <div class="tagger">
       @if (event()) {
         <div class="tagger-header">
+          <a class="back" [routerLink]="['/admin/events', route.snapshot.paramMap.get('id')]" [queryParams]="{tab: 'photos'}">&larr; Retour</a>
           <h2>{{ event()!.name }}</h2>
           <span class="progress-text">
             Photo {{ currentIndex() + 1 }}/{{ photos().length }}
             — {{ taggedPercent() }}% tagguées
           </span>
-          <span class="hints">Enter = valider · ← → = naviguer · Vide = repeter</span>
+          <span class="hints">Echap = retour · Enter = valider · ← → = naviguer · Vide = repeter</span>
         </div>
       }
 
-      @if (currentPhoto()) {
+      @if (allTaggedMessage()) {
+        <div class="all-tagged">
+          <p>Toutes les photos sont tagguées !</p>
+          <p class="hint">Redirection...</p>
+        </div>
+      }
+
+      @if (currentPhoto() && !allTaggedMessage()) {
         <div class="main-photo">
           <img [src]="getPreviewUrl(currentPhoto()!)" alt="Photo courante" />
         </div>
@@ -67,6 +75,8 @@ import { environment } from '../../../../environments/environment';
       border-bottom: 1px solid rgba(27, 58, 45, 0.1);
       flex-wrap: wrap;
     }
+    .back { color: $color-text-muted; text-decoration: none; font-size: $font-size-small; transition: color 0.15s; }
+    .back:hover { color: $color-forest-light; }
     .tagger-header h2 { margin: 0; color: $color-forest; font-family: $font-family; font-weight: $font-heading-weight; }
     .progress-text { color: $color-success; }
     .hints { color: $color-text-muted; font-size: 0.8rem; margin-left: auto; }
@@ -125,11 +135,21 @@ import { environment } from '../../../../environments/environment';
     .strip-thumb.current { border-color: $color-sand-light; opacity: 1; }
     .strip-thumb.tagged { border-color: $color-success; opacity: 0.8; }
     .strip-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .all-tagged {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      p { font-size: 1.5rem; color: $color-success; font-weight: 600; }
+      .hint { font-size: 1rem; color: $color-text-muted; font-weight: 400; }
+    }
   `],
 })
 export class SpeedTaggerComponent implements OnInit {
   private api = inject(ApiService);
-  private route = inject(ActivatedRoute);
+  route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   @ViewChild('bibInput') bibInputEl!: ElementRef<HTMLInputElement>;
   @ViewChild('stripContainer') stripContainer!: ElementRef<HTMLDivElement>;
@@ -139,6 +159,7 @@ export class SpeedTaggerComponent implements OnInit {
   currentIndex = signal(0);
   lastBibs = signal<string[]>([]);
   taggedIds = signal<Set<string>>(new Set());
+  allTaggedMessage = signal(false);
   bibValue = '';
 
   currentPhoto = computed(() => this.photos()[this.currentIndex()] || null);
@@ -146,6 +167,16 @@ export class SpeedTaggerComponent implements OnInit {
     const total = this.photos().length;
     if (!total) return 0;
     return Math.round((this.taggedIds().size / total) * 100);
+  });
+
+  private prefillEffect = effect(() => {
+    const photo = this.currentPhoto();
+    if (photo?.bibs?.length) {
+      this.bibValue = photo.bibs.map((b) => b.bibNumber).join(', ');
+      setTimeout(() => this.bibInputEl?.nativeElement?.select(), 0);
+    } else {
+      this.bibValue = '';
+    }
   });
 
   ngOnInit() {
@@ -166,6 +197,11 @@ export class SpeedTaggerComponent implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   onKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.router.navigate(['/admin/events', this.route.snapshot.paramMap.get('id')], { queryParams: { tab: 'photos' } });
+      return;
+    }
     if (e.target instanceof HTMLInputElement && e.key !== 'Enter' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     if (e.key === 'ArrowRight') { e.preventDefault(); this.next(); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); this.previous(); }
@@ -178,11 +214,24 @@ export class SpeedTaggerComponent implements OnInit {
       : this.lastBibs();
 
     if (bibs.length > 0 && this.currentPhoto()) {
-      this.api.updateBibs(this.currentPhoto()!.id, bibs).subscribe(() => {
+      const photo = this.currentPhoto()!;
+      this.api.updateBibs(photo.id, bibs).subscribe((updated) => {
         this.lastBibs.set(bibs);
         this.markCurrentAsTagged();
-        this.bibValue = '';
-        this.next();
+        // Update photo bibs in the local array so prefill works on revisit
+        const photos = this.photos().map((p) => (p.id === updated.id ? updated : p));
+        this.photos.set(photos);
+
+        if (this.taggedIds().size === this.photos().length) {
+          this.allTaggedMessage.set(true);
+          setTimeout(() => {
+            this.router.navigate(['/admin/events', this.route.snapshot.paramMap.get('id')], {
+              queryParams: { tab: 'photos' },
+            });
+          }, 1500);
+        } else {
+          this.next();
+        }
       });
     }
   }

@@ -134,8 +134,8 @@ export class PhotoUploadComponent {
   upload() {
     this.uploading.set(true);
     this.api.uploadPhotos(this.eventId, this.selectedFiles()).subscribe({
-      next: (photos) => {
-        this.uploadedCount.set(photos.length);
+      next: (result) => {
+        this.uploadedCount.set(result.created.length);
         this.uploading.set(false);
         this.uploadComplete.set(true);
       },

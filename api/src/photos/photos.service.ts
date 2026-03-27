@@ -52,15 +52,31 @@ export class PhotosService {
     return photo;
   }
 
-  async uploadBatch(eventId: string, files: Express.Multer.File[]): Promise<Photo[]> {
+  async uploadBatch(
+    eventId: string,
+    files: Express.Multer.File[],
+  ): Promise<{ created: Photo[]; skipped: { filename: string }[] }> {
     const event = await this.eventRepo.findOne({ where: { id: eventId } });
     if (!event) throw new NotFoundException('Event not found');
 
     const existingCount = await this.photoRepo.count({ where: { eventId } });
-    const photos: Photo[] = [];
+    const existingFilenames = await this.photoRepo
+      .find({ where: { eventId }, select: ['originalFilename'] })
+      .then((photos) => new Set(photos.map((p) => p.originalFilename).filter(Boolean)));
+
+    const created: Photo[] = [];
+    const skipped: { filename: string }[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
+      const filename = file.originalname;
+
+      if (existingFilenames.has(filename)) {
+        skipped.push({ filename });
+        continue;
+      }
+      existingFilenames.add(filename);
+
       const photoId = randomUUID();
       const ext = 'jpg';
 
@@ -70,7 +86,7 @@ export class PhotosService {
 
       const meta = await this.imageProcessing.getMetadata(file.buffer);
       const thumbnail = await this.imageProcessing.generateThumbnail(file.buffer);
-      const preview = await this.imageProcessing.generatePreview(file.buffer, true);
+      const preview = await this.imageProcessing.generatePreview(file.buffer, !event.isFree);
 
       await Promise.all([
         this.storage.upload(originalKey, file.buffer, 'image/jpeg'),
@@ -84,14 +100,15 @@ export class PhotosService {
         originalKey,
         previewKey,
         thumbnailKey,
+        originalFilename: filename,
         width: meta.width,
         height: meta.height,
-        sortOrder: existingCount + i,
+        sortOrder: existingCount + created.length,
       });
-      photos.push(await this.photoRepo.save(photo));
+      created.push(await this.photoRepo.save(photo));
     }
 
-    return photos;
+    return { created, skipped };
   }
 
   async updateBibs(photoId: string, bibs: string[]): Promise<Photo> {

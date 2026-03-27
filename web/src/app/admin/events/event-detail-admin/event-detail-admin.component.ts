@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ApiService, EventSummary, PhotoSummary } from '../../../core/services/api.service';
+import { ApiService, EventSummary, PhotoSummary, UploadResult } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -34,7 +34,6 @@ import { environment } from '../../../../environments/environment';
         <div class="tabs">
           <button [class.active]="tab() === 'details'" (click)="tab.set('details')">Détails</button>
           <button [class.active]="tab() === 'photos'" (click)="tab.set('photos')">Photos ({{ photos().length }})</button>
-          <button [class.active]="tab() === 'upload'" (click)="tab.set('upload')">Ajouter</button>
         </div>
 
         <!-- Tab: Details -->
@@ -95,105 +94,170 @@ import { environment } from '../../../../environments/environment';
         <!-- Tab: Photos -->
         @if (tab() === 'photos') {
           <div class="tab-content">
-            @if (photos().length === 0) {
-              <div class="empty">
-                <p>Aucune photo.</p>
-                <button class="btn btn-primary" (click)="tab.set('upload')">Ajouter des photos</button>
+            @if (photos().length === 0 && filesToUpload().length === 0 && !uploading() && !uploadDone()) {
+              <!-- Empty state: large drop zone -->
+              <div
+                class="dropzone dropzone-large"
+                [class.dragging]="dragging()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="dragging.set(false)"
+                (drop)="onDrop($event)"
+                (click)="fileInputEmpty.click()"
+              >
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <p>Glissez vos photos ici ou cliquez pour parcourir</p>
+                <p class="hint">Fichiers JPG uniquement</p>
+                <input #fileInputEmpty type="file" accept=".jpg,.jpeg" multiple hidden (change)="onFileSelect($event)" />
               </div>
             } @else {
-              <div class="photos-toolbar">
-                @if (selected().size > 0) {
-                  <span>{{ selected().size }} sélectionnée(s)</span>
-                  <button class="btn btn-danger btn-sm" (click)="deleteSelected()">Supprimer</button>
-                  <button class="btn btn-secondary btn-sm" (click)="clearSelection()">Désélectionner</button>
-                } @else {
-                  <button class="btn btn-secondary btn-sm" (click)="selectAllPhotos()">Tout sélectionner</button>
-                  <a [routerLink]="['/admin/events', eventId, 'tagger']" class="btn btn-secondary btn-sm">Speed Tagger</a>
-                }
-              </div>
+              <!-- Upload zone (when active, replaces toolbar) -->
+              @if (showUploadZone()) {
+                <div class="upload-zone">
+                  @if (!uploading() && !uploadDone()) {
+                    <div
+                      class="dropzone dropzone-inline"
+                      [class.dragging]="dragging()"
+                      (dragover)="onDragOver($event)"
+                      (dragleave)="dragging.set(false)"
+                      (drop)="onDrop($event)"
+                      (click)="fileInput.click()"
+                    >
+                      <p>Glissez vos photos ici ou cliquez pour parcourir</p>
+                      <p class="hint">Fichiers JPG uniquement</p>
+                      <input #fileInput type="file" accept=".jpg,.jpeg" multiple hidden (change)="onFileSelect($event)" />
+                    </div>
+                    @if (filesToUpload().length > 0) {
+                      <div class="upload-info">
+                        <span>{{ filesToUpload().length }} fichier(s) — {{ formatSize(uploadSize()) }}</span>
+                        <div class="upload-info-actions">
+                          <button class="btn btn-secondary btn-sm" (click)="resetUpload()">Annuler</button>
+                          <button class="btn btn-primary btn-sm" (click)="upload()">Envoyer</button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="upload-info">
+                        <span></span>
+                        <button class="btn btn-secondary btn-sm" (click)="resetUpload()">Annuler</button>
+                      </div>
+                    }
+                  }
 
-              <div class="photo-grid">
-                @for (photo of photos(); track photo.id) {
-                  <div class="photo-card" [class.selected]="selected().has(photo.id)">
-                    <div class="photo-img" (click)="toggleSelectPhoto(photo.id)">
-                      <img [src]="getThumbnailUrl(photo)" alt="" loading="lazy" />
-                      <div class="check" [class.visible]="selected().has(photo.id)">✓</div>
-                      @if (event()!.coverPhotoId === photo.id) {
-                        <div class="cover-badge">Couverture</div>
+                  @if (uploading()) {
+                    <div class="upload-progress">
+                      <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="uploadProgress()"></div>
+                      </div>
+                      <span class="progress-label">{{ uploadCurrent() }}/{{ uploadTotal() }} photos importées</span>
+                    </div>
+                  }
+
+                  @if (uploadDone()) {
+                    <div class="upload-summary">
+                      <p class="summary-line summary-created">{{ uploadResult()!.created.length }} photo(s) importée(s)</p>
+                      @if (uploadResult()!.skipped.length > 0) {
+                        <p class="summary-line summary-skipped">{{ uploadResult()!.skipped.length }} ignorée(s) (doublons)</p>
                       }
-                      <div class="photo-overlay" (click)="$event.stopPropagation()">
-                        <button class="overlay-btn" (click)="setCoverPhoto(photo.id)" [class.active]="event()!.coverPhotoId === photo.id" title="Définir comme couverture">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-                        </button>
-                        <button class="overlay-btn" (click)="previewPhoto.set(photo)" title="Voir en grand">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        </button>
-                        <button class="overlay-btn overlay-btn--danger" (click)="deleteOne(photo)" title="Supprimer">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
-                      </div>
+                      @if (uploadErrors().length > 0) {
+                        <p class="summary-line summary-error">{{ uploadErrors().length }} en erreur</p>
+                        <button class="btn btn-secondary btn-sm" (click)="retryErrors()">Réessayer</button>
+                      }
                     </div>
-                    <div class="photo-meta">
-                      <div class="bibs">
-                        @if (photo.bibs && photo.bibs.length > 0) {
-                          @for (bib of photo.bibs; track bib.bibNumber) {
-                            <span class="bib-tag">{{ bib.bibNumber }}</span>
-                          }
-                        } @else {
-                          <span class="no-bib">—</span>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        }
-
-        <!-- Tab: Upload -->
-        @if (tab() === 'upload') {
-          <div class="tab-content">
-            <div
-              class="dropzone"
-              [class.dragging]="dragging()"
-              (dragover)="onDragOver($event)"
-              (dragleave)="dragging.set(false)"
-              (drop)="onDrop($event)"
-              (click)="fileInput.click()"
-            >
-              <p>Glissez vos photos ici ou cliquez pour sélectionner</p>
-              <p class="hint">Fichiers JPG uniquement</p>
-              <input #fileInput type="file" accept=".jpg,.jpeg" multiple hidden (change)="onFileSelect($event)" />
-            </div>
-
-            @if (filesToUpload().length > 0 && !uploading()) {
-              <div class="upload-info">
-                <span>{{ filesToUpload().length }} fichier(s) — {{ formatSize(uploadSize()) }}</span>
-                <button class="btn btn-primary" (click)="upload()">Envoyer</button>
-              </div>
-            }
-            @if (uploading()) {
-              <p class="uploading">Upload en cours...</p>
-            }
-            @if (uploadDone()) {
-              <div class="upload-success">
-                <p>✓ {{ uploadedCount() }} photo(s) ajoutée(s)</p>
-                <div class="upload-actions">
-                  <button class="btn btn-primary" (click)="tab.set('photos')">Voir les photos</button>
-                  <a [routerLink]="['/admin/events', eventId, 'tagger']" class="btn btn-secondary">Speed Tagger</a>
+                  }
                 </div>
-              </div>
+              } @else {
+                <!-- Toolbar -->
+                <div class="photos-toolbar">
+                  @if (selected().size > 0) {
+                    <span>{{ selected().size }} sélectionnée(s)</span>
+                    <button class="btn btn-danger btn-sm" (click)="deleteSelected()">Supprimer</button>
+                    <button class="btn btn-secondary btn-sm" (click)="clearSelection()">Désélectionner</button>
+                  } @else {
+                    <button class="btn btn-secondary btn-sm" (click)="toggleUploadZone()">Ajouter des photos</button>
+                    <button class="btn btn-secondary btn-sm" (click)="selectAllPhotos()">Tout sélectionner</button>
+                    <a [routerLink]="['/admin/events', eventId, 'tagger']" class="btn btn-secondary btn-sm">Speed Tagger</a>
+                    <input
+                      type="text"
+                      class="input input-filter"
+                      placeholder="Filtrer par dossard..."
+                      [ngModel]="bibFilter()"
+                      (ngModelChange)="bibFilter.set($event)"
+                    />
+                  }
+                </div>
+              }
+
+              <!-- Photo grid -->
+              @if (filteredPhotos().length > 0) {
+                @if (bibFilter()) {
+                  <p class="filter-info">{{ filteredPhotos().length }} photo(s) pour le dossard "{{ bibFilter() }}"
+                    <button class="btn-link" (click)="bibFilter.set('')">Effacer le filtre</button>
+                  </p>
+                }
+                <div class="photo-grid">
+                  @for (photo of filteredPhotos(); track photo.id) {
+                    <div class="photo-card" [class.selected]="selected().has(photo.id)">
+                      <div class="photo-img" (click)="toggleSelectPhoto(photo.id)">
+                        <img [src]="getThumbnailUrl(photo)" alt="" loading="lazy" />
+                        <div class="check" [class.visible]="selected().has(photo.id)">✓</div>
+                        @if (event()!.coverPhotoId === photo.id) {
+                          <div class="cover-badge">Couverture</div>
+                        }
+                        <div class="photo-overlay" (click)="$event.stopPropagation()">
+                          <button class="overlay-btn" (click)="setCoverPhoto(photo.id)" [class.active]="event()!.coverPhotoId === photo.id" title="Définir comme couverture">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                          </button>
+                          <button class="overlay-btn" (click)="previewPhoto.set(photo)" title="Voir en grand">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                          </button>
+                          <button class="overlay-btn overlay-btn--danger" (click)="deleteOne(photo)" title="Supprimer">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="photo-meta" (click)="openEditBibs(photo); $event.stopPropagation()">
+                        <div class="bibs">
+                          @if (photo.bibs && photo.bibs.length > 0) {
+                            @for (bib of photo.bibs; track bib.bibNumber) {
+                              <span class="bib-tag">{{ bib.bibNumber }}</span>
+                            }
+                          } @else {
+                            <span class="no-bib">+ dossard</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else if (bibFilter()) {
+                <p class="filter-info">Aucune photo pour le dossard "{{ bibFilter() }}"
+                  <button class="btn-link" (click)="bibFilter.set('')">Effacer le filtre</button>
+                </p>
+              }
             }
           </div>
         }
 
-        <!-- Preview lightbox -->
-        @if (previewPhoto()) {
-          <div class="lightbox" (click)="previewPhoto.set(null)">
+        <!-- Lightbox (preview or bib edit) -->
+        @if (previewPhoto() || editingPhoto()) {
+          <div class="lightbox" (click)="closeLightbox()">
             <div class="lightbox-body" (click)="$event.stopPropagation()">
-              <button class="lightbox-close" (click)="previewPhoto.set(null)">&times;</button>
-              <img [src]="getPreviewUrl(previewPhoto()!)" alt="" />
+              <button class="lightbox-close" (click)="closeLightbox()">&times;</button>
+              @if (editingPhoto()) {
+                <img [src]="getPreviewUrl(editingPhoto()!)" alt="" />
+                <div class="lightbox-edit">
+                  <input
+                    class="input lightbox-bib-input"
+                    [(ngModel)]="editBibValue"
+                    (keydown.enter)="saveEditBibs()"
+                    (keydown.escape)="closeLightbox()"
+                    placeholder="Dossards séparés par des virgules"
+                    #lightboxBibInput
+                  />
+                  <button class="btn btn-primary btn-sm" (click)="saveEditBibs()">Valider</button>
+                </div>
+              } @else {
+                <img [src]="getPreviewUrl(previewPhoto()!)" alt="" />
+              }
             </div>
           </div>
         }
@@ -290,12 +354,7 @@ import { environment } from '../../../../environments/environment';
       border-radius: $radius-sm;
       border: 1px solid $color-sand-light;
     }
-    .photos-toolbar a {
-      color: $color-forest-light;
-      transition: color 0.15s;
-    }
-    .photos-toolbar a:hover { color: $color-forest; }
-    .btn-sm { padding: 0.35rem 0.75rem; font-size: $font-size-small; }
+    :host .btn.btn-sm { padding: 0.35rem 0.75rem; font-size: $font-size-small; }
     .btn-danger { background: $color-danger; color: $color-white; }
     .photo-grid {
       display: grid;
@@ -386,11 +445,10 @@ import { environment } from '../../../../environments/environment';
     .overlay-btn.active { background: $color-forest-light; color: $color-white; }
     .overlay-btn--danger:hover { background: $color-danger; color: $color-white; }
 
-    /* Upload tab */
+    /* Upload */
     .dropzone {
       border: 2px dashed $color-sand;
       border-radius: $radius-lg;
-      padding: 3rem;
       text-align: center;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s;
@@ -399,12 +457,84 @@ import { environment } from '../../../../environments/environment';
       border-color: $color-forest-light;
       background: rgba(74, 123, 90, 0.04);
     }
+    .dropzone-large {
+      padding: 4rem 3rem;
+      svg { color: $color-sand; margin-bottom: 1rem; }
+      p { margin: 0.25rem 0; }
+    }
+    .dropzone-inline { padding: 1.5rem; }
     .hint { color: $color-text-muted; font-size: $font-size-small; margin-top: 0.25rem; }
-    .upload-info { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
-    .uploading { color: $color-forest-light; margin-top: 1rem; }
-    .upload-success { margin-top: 1rem; }
-    .upload-success p { color: $color-success; margin-bottom: 0.75rem; }
-    .upload-actions { display: flex; gap: 0.5rem; }
+    .upload-zone {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: $color-white;
+      border-radius: $radius-sm;
+      border: 1px solid $color-sand-light;
+    }
+    .upload-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+      font-size: $font-size-small;
+      color: $color-text-muted;
+    }
+    .upload-info-actions { display: flex; gap: 0.5rem; }
+    .upload-progress {
+      padding: 0.75rem 0;
+    }
+    .progress-bar {
+      height: 8px;
+      background: rgba(74, 123, 90, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: $color-forest-light;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .upload-progress .progress-label {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: $font-size-small;
+      color: $color-forest-light;
+    }
+    .upload-summary {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 0.5rem 0;
+    }
+    .summary-line { margin: 0; font-size: $font-size-small; font-weight: 600; }
+    .summary-created { color: $color-success; }
+    .summary-skipped { color: $color-warning; }
+    .summary-error { color: $color-danger; }
+
+    .input-filter {
+      margin-left: auto;
+      width: 160px;
+      padding: 0.3rem 0.6rem;
+      font-size: $font-size-small;
+    }
+    .filter-info {
+      font-size: $font-size-small;
+      color: $color-text-muted;
+      margin-bottom: 0.75rem;
+    }
+    .btn-link {
+      background: none;
+      border: none;
+      color: $color-forest-light;
+      cursor: pointer;
+      font-size: $font-size-small;
+      text-decoration: underline;
+      padding: 0;
+    }
+    .photo-meta { cursor: pointer; }
+    .no-bib { color: $color-sand; font-size: $font-size-xs; }
 
     .empty { text-align: center; padding: 3rem; color: $color-text-muted; }
     .empty .btn { margin-top: 0.75rem; }
@@ -442,6 +572,16 @@ import { environment } from '../../../../environments/environment';
       transition: box-shadow 0.15s;
     }
     .lightbox-close:hover { box-shadow: $shadow-elevated; }
+    .lightbox-edit {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .lightbox-bib-input {
+      flex: 1;
+      font-size: 1rem;
+      padding: 0.5rem 0.75rem;
+    }
   `],
 })
 export class EventDetailAdminComponent implements OnInit {
@@ -452,11 +592,22 @@ export class EventDetailAdminComponent implements OnInit {
   eventId = '';
   event = signal<EventSummary | null>(null);
   photos = signal<PhotoSummary[]>([]);
-  tab = signal<'details' | 'photos' | 'upload'>('details');
+  tab = signal<'details' | 'photos'>('details');
   saving = signal(false);
   saved = signal(false);
   selected = signal<Set<string>>(new Set());
   previewPhoto = signal<PhotoSummary | null>(null);
+
+  // Filter & bib edit
+  bibFilter = signal('');
+  editingPhoto = signal<PhotoSummary | null>(null);
+  editBibValue = '';
+  filteredPhotos = computed(() => {
+    const filter = this.bibFilter().trim();
+    const photos = this.photos();
+    if (!filter) return photos;
+    return photos.filter((p) => p.bibs?.some((b) => b.bibNumber.includes(filter)));
+  });
 
   // Details form
   form = { name: '', date: '', location: '', description: '', isFree: false };
@@ -464,15 +615,25 @@ export class EventDetailAdminComponent implements OnInit {
   packEuros = 15;
 
   // Upload
+  showUploadZone = signal(false);
   dragging = signal(false);
   filesToUpload = signal<File[]>([]);
   uploadSize = signal(0);
   uploading = signal(false);
   uploadDone = signal(false);
-  uploadedCount = signal(0);
+  uploadCurrent = signal(0);
+  uploadTotal = signal(0);
+  uploadProgress = computed(() => {
+    const total = this.uploadTotal();
+    return total ? Math.round((this.uploadCurrent() / total) * 100) : 0;
+  });
+  uploadResult = signal<UploadResult | null>(null);
+  uploadErrors = signal<File[]>([]);
 
   ngOnInit() {
     this.eventId = this.route.snapshot.paramMap.get('id')!;
+    const tabParam = this.route.snapshot.queryParamMap.get('tab');
+    if (tabParam === 'photos') this.tab.set('photos');
     this.loadEvent();
     this.loadPhotos();
   }
@@ -561,7 +722,33 @@ export class EventDetailAdminComponent implements OnInit {
     }
   }
 
+  // Bib edit lightbox
+  openEditBibs(photo: PhotoSummary) {
+    this.editingPhoto.set(photo);
+    this.editBibValue = photo.bibs?.map((b) => b.bibNumber).join(', ') || '';
+  }
+
+  saveEditBibs() {
+    const photo = this.editingPhoto();
+    if (!photo) return;
+    const bibs = this.editBibValue.split(',').map((b) => b.trim()).filter(Boolean);
+    this.editingPhoto.set(null);
+    this.api.updateBibs(photo.id, bibs).subscribe((updated) => {
+      this.photos.set(this.photos().map((p) => (p.id === updated.id ? updated : p)));
+    });
+  }
+
+  closeLightbox() {
+    this.previewPhoto.set(null);
+    this.editingPhoto.set(null);
+  }
+
   // Upload
+  toggleUploadZone() {
+    this.showUploadZone.set(!this.showUploadZone());
+    if (!this.showUploadZone()) this.resetUpload();
+  }
+
   onDragOver(e: DragEvent) { e.preventDefault(); this.dragging.set(true); }
   onDrop(e: DragEvent) {
     e.preventDefault();
@@ -575,19 +762,74 @@ export class EventDetailAdminComponent implements OnInit {
     this.filesToUpload.set(files);
     this.uploadSize.set(files.reduce((s, f) => s + f.size, 0));
     this.uploadDone.set(false);
+    this.uploadResult.set(null);
+    this.uploadErrors.set([]);
+    this.showUploadZone.set(true);
   }
+
   upload() {
+    const files = this.filesToUpload();
     this.uploading.set(true);
-    this.api.uploadPhotos(this.eventId, this.filesToUpload()).subscribe({
-      next: (photos) => {
-        this.uploadedCount.set(photos.length);
+    this.uploadTotal.set(files.length);
+    this.uploadCurrent.set(0);
+    this.uploadDone.set(false);
+
+    const BATCH_SIZE = 5;
+    const allCreated: PhotoSummary[] = [];
+    const allSkipped: { filename: string }[] = [];
+    const errorFiles: File[] = [];
+
+    const uploadBatch = (startIdx: number) => {
+      if (startIdx >= files.length) {
         this.uploading.set(false);
         this.uploadDone.set(true);
+        this.uploadResult.set({ created: allCreated, skipped: allSkipped });
+        this.uploadErrors.set(errorFiles);
         this.filesToUpload.set([]);
         this.loadPhotos();
-      },
-      error: () => this.uploading.set(false),
-    });
+        if (errorFiles.length === 0) {
+          setTimeout(() => this.resetUpload(), 2000);
+        }
+        return;
+      }
+
+      const batch = files.slice(startIdx, startIdx + BATCH_SIZE);
+      this.api.uploadPhotos(this.eventId, batch).subscribe({
+        next: (result) => {
+          allCreated.push(...result.created);
+          allSkipped.push(...result.skipped);
+          this.uploadCurrent.set(startIdx + batch.length);
+          uploadBatch(startIdx + BATCH_SIZE);
+        },
+        error: () => {
+          errorFiles.push(...batch);
+          this.uploadCurrent.set(startIdx + batch.length);
+          uploadBatch(startIdx + BATCH_SIZE);
+        },
+      });
+    };
+
+    uploadBatch(0);
+  }
+
+  retryErrors() {
+    const errors = this.uploadErrors();
+    if (errors.length === 0) return;
+    this.filesToUpload.set(errors);
+    this.uploadSize.set(errors.reduce((s, f) => s + f.size, 0));
+    this.uploadDone.set(false);
+    this.uploadResult.set(null);
+    this.uploadErrors.set([]);
+    this.upload();
+  }
+
+  resetUpload() {
+    this.filesToUpload.set([]);
+    this.uploadDone.set(false);
+    this.uploadResult.set(null);
+    this.uploadErrors.set([]);
+    this.uploading.set(false);
+    this.showUploadZone.set(false);
   }
 
   // Urls

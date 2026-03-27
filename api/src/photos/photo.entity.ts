@@ -32,6 +32,9 @@ export class Photo {
   @Column({ type: 'integer' })
   height: number;
 
+  @Column({ name: 'original_filename', nullable: true })
+  originalFilename: string;
+
   @Column({ name: 'sort_order', type: 'integer', default: 0 })
   sortOrder: number;
 

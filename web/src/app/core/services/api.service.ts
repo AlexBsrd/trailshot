@@ -27,6 +27,11 @@ export interface PhotoSummary {
   bibs?: { bibNumber: string }[];
 }
 
+export interface UploadResult {
+  created: PhotoSummary[];
+  skipped: { filename: string }[];
+}
+
 export interface OrderResult {
   id: string;
   orderNumber: number;
@@ -115,10 +120,10 @@ export class ApiService {
     return this.http.get<PhotoSummary[]>(`${this.base}/admin/events/${eventId}/photos`);
   }
 
-  uploadPhotos(eventId: string, files: File[]): Observable<PhotoSummary[]> {
+  uploadPhotos(eventId: string, files: File[]): Observable<UploadResult> {
     const formData = new FormData();
     files.forEach((f) => formData.append('photos', f));
-    return this.http.post<PhotoSummary[]>(
+    return this.http.post<UploadResult>(
       `${this.base}/admin/events/${eventId}/photos/upload`, formData,
     );
   }
