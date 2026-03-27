@@ -18,14 +18,22 @@ export interface CartEventInfo {
 export class CartService {
   private items = signal<CartItem[]>([]);
   private packMode = signal(false);
+  private packBib = signal('');
   private eventInfo = signal<CartEventInfo | null>(null);
 
   readonly cartItems = this.items.asReadonly();
   readonly isPackMode = this.packMode.asReadonly();
+  readonly packBibNumber = this.packBib.asReadonly();
   readonly count = computed(() => this.items().length);
   readonly event = this.eventInfo.asReadonly();
 
   setEvent(info: CartEventInfo): void {
+    const current = this.eventInfo();
+    if (current && current.slug !== info.slug) {
+      this.items.set([]);
+      this.packMode.set(false);
+      this.packBib.set('');
+    }
     this.eventInfo.set(info);
   }
 
@@ -47,18 +55,20 @@ export class CartService {
     return this.items().some((i) => i.photoId === photoId);
   }
 
-  selectPack(photoIds: string[], eventId: string, thumbnailKeys?: string[]): void {
+  selectPack(photoIds: string[], eventId: string, thumbnailKeys?: string[], bib?: string): void {
     this.items.set(photoIds.map((photoId, i) => ({
       photoId,
       eventId,
       thumbnailKey: thumbnailKeys?.[i],
     })));
     this.packMode.set(true);
+    this.packBib.set(bib || '');
   }
 
   clear(): void {
     this.items.set([]);
     this.packMode.set(false);
+    this.packBib.set('');
     this.eventInfo.set(null);
   }
 

@@ -25,15 +25,19 @@ import { NavbarComponent } from './layout/navbar/navbar.component';
   styles: [`
     @use 'tokens' as *;
 
+    :host {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
     main {
-      min-height: calc(100vh - 120px);
+      flex: 1;
       padding-top: 64px;
     }
     main.has-hero {
       padding-top: 0;
     }
     main.admin-page {
-      min-height: 100vh;
       padding-top: 0;
     }
     .footer {

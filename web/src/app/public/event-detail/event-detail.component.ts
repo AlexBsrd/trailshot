@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [RouterLink, FormsModule, ScrollRevealDirective],
   template: `
-    <div class="event-detail">
+    <div class="event-detail" [class.has-sticky-bar]="cart.count() > 0">
       @if (event()) {
         <div class="event-header">
           <h1>{{ event()!.name }}</h1>
@@ -41,13 +41,16 @@ import { environment } from '../../../environments/environment';
                 </button>
               }
             </form>
+            @if (!activeBib() && photos().length > 0 && !event()!.isFree) {
+              <p class="pack-hint">Recherchez votre dossard pour profiter du pack à {{ formatPrice(event()!.pricePack) }}</p>
+            }
           </div>
         </div>
 
         @if (activeBib() && photos().length > 0 && !event()!.isFree) {
           <div class="pack-cta" scrollReveal>
             <div class="pack-cta-text">
-              <span class="pack-label">Pack complet</span>
+              <span class="pack-label">Pack complet — Dossard {{ activeBib() }}</span>
               <span class="pack-count">{{ photos().length }} photos</span>
             </div>
             <div class="pack-cta-pricing">
@@ -134,13 +137,22 @@ import { environment } from '../../../environments/environment';
           <div class="sticky-bar">
             <span class="sticky-count">{{ cart.count() }} photo(s) sélectionnée(s)</span>
             @if (!event()!.isFree) {
-              <span class="sticky-total">
-                {{ cart.isPackMode() ? formatPrice(event()!.pricePack) : formatPrice(cart.count() * event()!.priceSingle) }}
-              </span>
+              @if (packBetterDeal()) {
+                <span class="sticky-pricing">
+                  <span class="sticky-old-price">{{ formatPrice(cart.count() * event()!.priceSingle) }}</span>
+                  <span class="sticky-total">{{ formatPrice(event()!.pricePack) }}</span>
+                </span>
+                <button class="btn-order" (click)="selectPack()">Pack complet</button>
+              } @else {
+                <span class="sticky-total">
+                  {{ cart.isPackMode() ? formatPrice(event()!.pricePack) : formatPrice(cart.count() * event()!.priceSingle) }}
+                </span>
+                <a routerLink="/order" class="btn-order">Commander</a>
+              }
             } @else {
               <span class="sticky-total sticky-total--free">Gratuit</span>
+              <a routerLink="/order" class="btn-order">Commander</a>
             }
-            <a routerLink="/order" class="btn-order">Commander</a>
           </div>
         }
       }
@@ -152,7 +164,10 @@ import { environment } from '../../../environments/environment';
 
     .event-detail {
       padding: 0;
-      padding-bottom: 80px;
+
+      &.has-sticky-bar {
+        padding-bottom: 80px;
+      }
     }
 
     /* ── Event Header ── */
@@ -270,6 +285,14 @@ import { environment } from '../../../environments/environment';
         color: $color-cream;
         &:hover { background: rgba(255, 255, 255, 0.2); }
       }
+    }
+
+    /* ── Pack Hint ── */
+    .pack-hint {
+      margin: 0.75rem 0 0;
+      color: rgba($color-cream, 0.85);
+      font-size: $font-size-small;
+      text-align: center;
     }
 
     /* ── Pack CTA Banner ── */
@@ -577,6 +600,16 @@ import { environment } from '../../../environments/environment';
       color: $color-sand-light;
       font-size: $font-size-h2;
     }
+    .sticky-pricing {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sticky-old-price {
+      text-decoration: line-through;
+      opacity: 0.6;
+      font-size: $font-size-body;
+    }
     .btn-order {
       display: inline-block;
       background: $color-sand-light;
@@ -631,6 +664,11 @@ export class EventDetailComponent implements OnInit {
     const all = this.photos();
     return idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
   });
+  packBetterDeal = computed(() => {
+    const ev = this.event();
+    if (!ev || ev.isFree || !this.activeBib()) return false;
+    return this.cart.count() * ev.priceSingle >= ev.pricePack;
+  });
 
   @HostListener('window:keydown', ['$event'])
   onKeydown(e: KeyboardEvent) {
@@ -677,6 +715,14 @@ export class EventDetailComponent implements OnInit {
     if (this.bibInput.trim()) {
       const slug = this.route.snapshot.paramMap.get('slug')!;
       this.activeBib.set(this.bibInput.trim());
+      this.cart.clear();
+      this.cart.setEvent({
+        name: this.event()!.name,
+        slug: this.event()!.slug,
+        isFree: this.event()!.isFree,
+        priceSingle: this.event()!.priceSingle,
+        pricePack: this.event()!.pricePack,
+      });
       this.loading.set(true);
       this.router.navigate([], { queryParams: { bib: this.bibInput.trim() } });
       this.api.getPhotosByBib(slug, this.bibInput.trim()).subscribe((photos) => {
@@ -689,6 +735,14 @@ export class EventDetailComponent implements OnInit {
   clearBib() {
     this.activeBib.set('');
     this.bibInput = '';
+    this.cart.clear();
+    this.cart.setEvent({
+      name: this.event()!.name,
+      slug: this.event()!.slug,
+      isFree: this.event()!.isFree,
+      priceSingle: this.event()!.priceSingle,
+      pricePack: this.event()!.pricePack,
+    });
     this.loading.set(true);
     const slug = this.route.snapshot.paramMap.get('slug')!;
     this.router.navigate([], { queryParams: {} });
@@ -724,7 +778,7 @@ export class EventDetailComponent implements OnInit {
     const keys = photos.map((p) => p.thumbnailKey);
     const eventId = this.event()?.id;
     if (eventId) {
-      this.cart.selectPack(ids, eventId, keys);
+      this.cart.selectPack(ids, eventId, keys, this.activeBib());
       this.router.navigate(['/order']);
     }
   }
