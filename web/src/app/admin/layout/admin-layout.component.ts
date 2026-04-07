@@ -9,20 +9,28 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     <div class="admin-layout">
       <aside class="sidebar">
         <a routerLink="/" class="sidebar-logo">
-          <span class="logo-trail">TRAIL</span><span class="logo-shot">SHOT</span>
+          <span class="logo-text">TRAIL<span class="logo-sep">/</span>SHOT</span>
           <span class="logo-admin">Admin</span>
         </a>
         <nav class="sidebar-nav">
           <a routerLink="/admin/events" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
-            <span class="nav-icon">📋</span> Courses
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Courses
           </a>
           <a routerLink="/admin/orders" routerLinkActive="active">
-            <span class="nav-icon">🛒</span> Commandes
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Commandes
           </a>
         </nav>
         <div class="sidebar-footer">
-          <a routerLink="/" class="sidebar-link">← Voir le site</a>
-          <button class="sidebar-link" (click)="logout()">Déconnexion</button>
+          <a routerLink="/" class="sidebar-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Voir le site
+          </a>
+          <button class="sidebar-link" (click)="logout()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Déconnexion
+          </button>
         </div>
       </aside>
       <main class="admin-main">
@@ -34,36 +42,50 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     @use 'tokens' as *;
     @use 'animations' as *;
 
+    $cubic-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
     .admin-layout { display: flex; min-height: 100vh; }
+
     .sidebar {
-      width: 240px;
-      background: $color-forest;
+      width: 260px;
+      background: linear-gradient(180deg, #1B3A2D 0%, #162F25 100%);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
+      padding-top: 0;
     }
+
     .sidebar-logo {
       display: flex;
       align-items: baseline;
       gap: 0;
-      padding: 1.25rem 1.5rem;
+      padding: 1.5rem;
       text-decoration: none;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: $font-heading-weight;
-      font-family: $font-family;
-      letter-spacing: 1.5px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: $font-display;
+      letter-spacing: 3px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
-    .logo-trail { color: $color-cream; }
-    .logo-shot { color: $color-cream; }
+    .logo-text { color: $color-cream; }
+    .logo-sep {
+      opacity: 0.3;
+      margin: 0 2px;
+      font-weight: 400;
+    }
     .logo-admin {
-      color: $color-sand-light;
-      font-size: $font-size-xs;
-      font-weight: 500;
-      margin-left: 6px;
+      background: rgba(184, 145, 58, 0.2);
+      color: $color-accent-light;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      margin-left: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      font-family: $font-family;
     }
+
     .sidebar-nav {
       flex: 1;
       display: flex;
@@ -73,34 +95,42 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     .sidebar-nav a {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.5rem;
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
       color: rgba(250, 247, 242, 0.75);
       text-decoration: none;
       font-size: $font-size-body;
       font-family: $font-family;
-      transition: background 0.15s, color 0.15s, border-left 0.15s;
+      font-weight: 500;
+      transition: background 0.25s $cubic-smooth, color 0.25s $cubic-smooth, border-left 0.25s $cubic-smooth;
       border-left: 3px solid transparent;
+
+      svg { opacity: 0.6; transition: opacity 0.25s $cubic-smooth; }
     }
     .sidebar-nav a:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
       color: $color-cream;
+      svg { opacity: 1; }
     }
     .sidebar-nav a.active {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(184, 145, 58, 0.12);
       color: $color-cream;
       font-weight: 600;
-      border-left: 3px solid $color-sand-light;
+      border-left: 3px solid $color-accent;
+      svg { opacity: 1; stroke: $color-accent-light; }
     }
-    .nav-icon { font-size: 1.1rem; }
+
     .sidebar-footer {
-      padding: 1rem 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.15rem;
     }
     .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       background: none;
       border: none;
       color: $color-cream;
@@ -111,10 +141,11 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
       padding: 0.25rem 0;
       text-align: left;
       opacity: 0.65;
-      transition: opacity 0.15s;
+      transition: opacity 0.25s $cubic-smooth;
     }
     .sidebar-link:hover { opacity: 1; }
-    .admin-main { flex: 1; overflow-y: auto; background: $color-cream; }
+
+    .admin-main { flex: 1; overflow-y: auto; background: #F5F3EE; min-height: 100vh; }
   `],
 })
 export class AdminLayoutComponent {

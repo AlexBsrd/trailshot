@@ -178,11 +178,13 @@ import { environment } from '../../../environments/environment';
     }
     .event-header h1 {
       color: $color-forest;
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
       font-size: $font-size-hero;
       margin: 0 0 0.25rem;
       line-height: 1.15;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     .event-meta {
       color: $color-sand;
@@ -192,8 +194,8 @@ import { environment } from '../../../environments/environment';
     }
     .badge-free {
       display: inline-block;
-      background: $color-sand-light;
-      color: $color-forest;
+      background: rgba(58, 125, 74, 0.1);
+      color: $color-success;
       font-size: $font-size-xs;
       font-weight: $font-subheading-weight;
       padding: 3px 10px;
@@ -267,8 +269,8 @@ import { environment } from '../../../environments/environment';
       }
     }
     .btn-search {
-      background: $color-sand-light;
-      color: $color-forest;
+      background: $color-accent;
+      color: $color-white;
       border: none;
       border-radius: 8px;
       padding: 0.65rem 1.5rem;
@@ -276,10 +278,10 @@ import { environment } from '../../../environments/environment';
       font-weight: $font-subheading-weight;
       font-family: $font-family;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: background-color 0.2s;
       white-space: nowrap;
 
-      &:hover { opacity: 0.9; }
+      &:hover { background-color: $color-accent-light; }
       &.btn-secondary {
         background: rgba(255, 255, 255, 0.12);
         color: $color-cream;
@@ -308,8 +310,11 @@ import { environment } from '../../../environments/environment';
       gap: 1rem;
     }
     .pack-label {
+      font-family: $font-display;
       font-weight: $font-subheading-weight;
       font-size: $font-size-h2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .pack-count {
       font-size: $font-size-body;
@@ -327,8 +332,8 @@ import { environment } from '../../../environments/environment';
       font-size: $font-size-body;
     }
     .btn-pack {
-      background: $color-sand-light;
-      color: $color-forest;
+      background: $color-accent;
+      color: $color-white;
       border: none;
       border-radius: 8px;
       padding: 0.65rem 1.5rem;
@@ -336,9 +341,9 @@ import { environment } from '../../../environments/environment';
       font-weight: $font-subheading-weight;
       font-family: $font-family;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: background-color 0.2s;
 
-      &:hover { opacity: 0.9; }
+      &:hover { background-color: $color-accent-light; }
     }
 
     /* ── Photo Grid ── */
@@ -361,7 +366,7 @@ import { environment } from '../../../environments/environment';
       border-radius: $radius-sm;
       overflow: hidden;
       border: 3px solid transparent;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 
       &::after {
         content: '';
@@ -498,9 +503,9 @@ import { environment } from '../../../environments/environment';
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.2s;
+      transition: background-color 0.2s;
 
-      &:hover { opacity: 0.7; }
+      &:hover { background-color: rgba(255, 255, 255, 0.2); }
     }
     .lightbox-arrow {
       position: absolute;
@@ -539,8 +544,8 @@ import { environment } from '../../../environments/environment';
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: $color-sand-light;
-      color: $color-forest;
+      background: $color-accent;
+      color: $color-white;
       border: none;
       border-radius: 8px;
       padding: 0.5rem 1.25rem;
@@ -548,10 +553,10 @@ import { environment } from '../../../environments/environment';
       font-weight: $font-subheading-weight;
       font-family: $font-family;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: background-color 0.2s;
       white-space: nowrap;
 
-      &:hover { opacity: 0.9; }
+      &:hover { background-color: $color-accent-light; }
       &.in-cart {
         background: rgba(255, 255, 255, 0.15);
         color: $color-cream;
@@ -612,8 +617,8 @@ import { environment } from '../../../environments/environment';
     }
     .btn-order {
       display: inline-block;
-      background: $color-sand-light;
-      color: $color-forest;
+      background: $color-accent;
+      color: $color-white;
       border: none;
       border-radius: 8px;
       padding: 0.65rem 1.75rem;
@@ -622,10 +627,10 @@ import { environment } from '../../../environments/environment';
       font-family: $font-family;
       text-decoration: none;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: background-color 0.2s;
       text-align: center;
 
-      &:hover { opacity: 0.9; }
+      &:hover { background-color: $color-accent-light; }
     }
 
     /* ── Empty State ── */

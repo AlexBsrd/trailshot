@@ -211,8 +211,11 @@ import { environment } from '../../../environments/environment';
 
       h1 {
         color: $color-forest;
+        font-family: $font-display;
         font-weight: $font-heading-weight;
         font-size: $font-size-h1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         margin: 0;
       }
     }
@@ -295,7 +298,7 @@ import { environment } from '../../../environments/environment';
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.15s, background 0.15s;
+      transition: color 0.2s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 
       &:hover {
         color: $color-danger;
@@ -324,7 +327,7 @@ import { environment } from '../../../environments/environment';
       font-size: $font-size-body;
     }
     .price-row--total {
-      border-top: 2px solid $color-forest;
+      border-top: 2px solid $color-accent;
       margin-top: 0.5rem;
       padding-top: 0.75rem;
       font-weight: $font-heading-weight;
@@ -353,7 +356,7 @@ import { environment } from '../../../environments/environment';
       font-family: $font-family;
       color: $color-text;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.25s cubic-bezier(0.22, 1, 0.36, 1);
       background: $color-cream;
 
       &::placeholder { color: $color-text-muted; }
@@ -371,7 +374,7 @@ import { environment } from '../../../environments/environment';
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      background: $color-forest;
+      background: $color-accent;
       color: $color-cream;
       border: none;
       border-radius: 8px;
@@ -380,11 +383,11 @@ import { environment } from '../../../environments/environment';
       font-weight: $font-subheading-weight;
       font-family: $font-family;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.25s cubic-bezier(0.22, 1, 0.36, 1);
       text-decoration: none;
       margin-top: 0.5rem;
 
-      &:hover { background: $color-forest-light; }
+      &:hover { background: $color-accent-light; }
       &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -414,6 +417,7 @@ import { environment } from '../../../environments/environment';
     }
     .success h2 {
       color: $color-forest;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
       margin-bottom: 0.5rem;
     }
@@ -426,10 +430,10 @@ import { environment } from '../../../environments/environment';
       margin-bottom: 1.5rem;
     }
     .order-num {
-      font-family: monospace;
+      font-family: $font-display;
       font-size: $font-size-h2;
       font-weight: $font-heading-weight;
-      color: $color-forest;
+      color: $color-accent;
       margin-bottom: 0.5rem;
     }
     .success-actions {
@@ -452,7 +456,7 @@ import { environment } from '../../../environments/environment';
       font-family: $font-family;
       cursor: pointer;
       text-decoration: none;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.25s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 
       &:hover { background: rgba(74, 123, 90, 0.08); }
     }
@@ -465,7 +469,7 @@ import { environment } from '../../../environments/environment';
       font-family: $font-family;
       cursor: pointer;
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 
       &:hover { opacity: 0.7; }
     }
@@ -509,7 +513,7 @@ import { environment } from '../../../environments/environment';
       border-left: 1.5px solid rgba(27, 58, 45, 0.15);
       color: $color-forest;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.2s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 
       &:hover { background: rgba(27, 58, 45, 0.06); }
       &.copied { color: $color-success; }
@@ -532,19 +536,21 @@ import { environment } from '../../../environments/environment';
     .btn-submit--free {
       background: $color-forest-light;
       width: 100%;
+
+      &:hover { background: $color-forest-light; }
     }
 
     .btn-action {
       display: inline-block;
-      background: $color-sand-light;
-      color: $color-forest;
+      background: $color-accent;
+      color: white;
       font-weight: $font-subheading-weight;
       border-radius: 8px;
       padding: 0.75rem 1.5rem;
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: background 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 
-      &:hover { opacity: 0.9; }
+      &:hover { background: $color-accent-light; }
     }
   `],
 })

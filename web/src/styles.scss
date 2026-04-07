@@ -14,6 +14,8 @@ body {
   line-height: 1.6;
   font-weight: $font-body-weight;
   font-size: $font-size-body;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a { color: inherit; }
@@ -21,14 +23,14 @@ a { color: inherit; }
 // Inputs
 .input {
   background: $color-white;
-  border: 1px solid $color-sand-light;
+  border: 1.5px solid rgba(27, 58, 45, 0.12);
   color: $color-text;
-  padding: 0.6rem 1rem;
+  padding: 0.65rem 1rem;
   border-radius: $radius-sm;
   font-size: $font-size-body;
   font-family: $font-family;
   width: 100%;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 .input:focus {
   outline: none;
@@ -41,7 +43,7 @@ a { color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1.25rem;
+  padding: 0.65rem 1.25rem;
   border-radius: $radius-sm;
   border: none;
   font-size: $font-size-body;
@@ -49,14 +51,16 @@ a { color: inherit; }
   font-weight: $font-subheading-weight;
   cursor: pointer;
   text-decoration: none;
-  transition: opacity 0.2s;
+  transition: background 0.2s, transform 0.15s;
 }
-.btn:hover { opacity: 0.9; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 .btn-primary {
   background: $color-forest;
   color: $color-white;
+  &:hover { background: lighten($color-forest, 8%); }
 }
 .btn-secondary {
   background: $color-sand-light;
@@ -78,36 +82,37 @@ a { color: inherit; }
 // Badges
 .badge {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 4px;
   font-size: $font-size-xs;
   font-weight: 600;
+  letter-spacing: 0.02em;
 }
 .badge-free {
-  background: $color-success;
-  color: $color-white;
+  background: rgba(58, 125, 74, 0.1);
+  color: $color-success;
 }
 .badge-published {
-  background: $color-success;
-  color: $color-white;
+  background: rgba(58, 125, 74, 0.1);
+  color: $color-success;
 }
 .badge-pack {
   background: $color-sand;
   color: $color-white;
 }
 .badge-draft {
-  background: $color-text-muted;
-  color: $color-white;
+  background: rgba(122, 139, 126, 0.15);
+  color: $color-text-muted;
 }
 .badge-archived {
   background: $color-sand-light;
   color: $color-forest;
 }
 .badge-paid {
-  background: $color-success;
-  color: $color-white;
+  background: rgba(58, 125, 74, 0.1);
+  color: $color-success;
 }
 .badge-pending {
-  background: $color-warning;
-  color: $color-white;
+  background: rgba(196, 150, 58, 0.15);
+  color: $color-warning;
 }

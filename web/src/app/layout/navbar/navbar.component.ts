@@ -71,7 +71,8 @@ import { CartService } from '../../core/services/cart.service';
       align-items: center;
       padding: 1rem 2rem;
       background: transparent;
-      transition: background 0.3s, box-shadow 0.3s;
+      transition: background 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .navbar--scrolled,
@@ -84,19 +85,31 @@ import { CartService } from '../../core/services/cart.service';
 
     .logo {
       text-decoration: none;
-      font-size: 1.5rem;
+      font-family: $font-display;
+      font-size: 1.25rem;
       font-weight: $font-heading-weight;
-      letter-spacing: 1.5px;
+      letter-spacing: 3px;
     }
 
-    .logo-trail,
+    .logo-trail {
+      color: $color-cream;
+    }
+
     .logo-shot {
       color: $color-cream;
+
+      &::before {
+        content: '/';
+        display: inline-block;
+        margin: 0 0.15em;
+        opacity: 0.5;
+        font-weight: 300;
+      }
     }
 
     .nav-links {
       display: flex;
-      gap: 1.5rem;
+      gap: 2rem;
       align-items: center;
     }
 
@@ -104,8 +117,9 @@ import { CartService } from '../../core/services/cart.service';
       color: $color-cream;
       opacity: 0.8;
       text-decoration: none;
-      transition: opacity 0.2s;
+      font-family: $font-family;
       font-weight: 500;
+      transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .nav-links a:hover,
@@ -114,12 +128,17 @@ import { CartService } from '../../core/services/cart.service';
     }
 
     .cart-link {
-      background: $color-sand-light !important;
-      color: $color-forest !important;
+      background: $color-accent !important;
+      color: #fff !important;
       opacity: 1 !important;
       padding: 0.4rem 1rem;
       border-radius: $radius-sm;
       font-weight: $font-subheading-weight;
+      transition: background 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+
+      &:hover {
+        background: $color-accent-light !important;
+      }
     }
 
     // Hamburger button - hidden on desktop
@@ -139,7 +158,7 @@ import { CartService } from '../../core/services/cart.service';
       height: 2px;
       background: $color-cream;
       border-radius: 2px;
-      transition: transform 0.2s;
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     // Mobile backdrop
@@ -160,7 +179,7 @@ import { CartService } from '../../core/services/cart.service';
       z-index: 300;
       background: $color-forest;
       transform: translateX(100%);
-      transition: transform 0.3s ease;
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
       padding: 2rem 1.5rem;
       display: flex;
       flex-direction: column;
@@ -192,9 +211,10 @@ import { CartService } from '../../core/services/cart.service';
       color: $color-cream;
       opacity: 0.8;
       text-decoration: none;
+      font-family: $font-family;
       font-size: 1.1rem;
       font-weight: 500;
-      transition: opacity 0.2s;
+      transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .mobile-nav a:hover,

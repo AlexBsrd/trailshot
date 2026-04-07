@@ -79,30 +79,39 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
       margin-bottom: 1.5rem;
     }
     .header h1 {
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
       color: $color-forest;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .table { width: 100%; border-collapse: collapse; }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: $radius-md;
+      overflow: hidden;
+      box-shadow: $shadow-card;
+      background: $color-white;
+    }
     .table th, .table td {
       padding: 0.75rem;
       text-align: left;
       border-bottom: 1px solid $color-sand-light;
     }
     .table thead tr {
-      background: rgba(27, 58, 45, 0.05);
+      background: rgba(27, 58, 45, 0.04);
     }
     .table th {
       color: $color-text-muted;
       font-weight: 600;
       font-size: $font-size-small;
     }
-    .table tbody tr:nth-child(even) {
-      background: $color-cream;
-    }
     .table tbody tr:nth-child(odd) {
       background: $color-white;
+    }
+    .table tbody tr:nth-child(even) {
+      background: rgba(27, 58, 45, 0.015);
     }
     .table tbody tr:hover {
       background: rgba(166, 139, 91, 0.08);
@@ -121,7 +130,7 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       white-space: nowrap;
     }
     .action-btn svg { flex-shrink: 0; }
@@ -152,8 +161,11 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
     }
 
     :host .btn-primary {
-      background: $color-forest;
-      color: $color-cream;
+      background: $color-accent;
+      color: $color-white;
+    }
+    :host .btn-primary:hover {
+      background: $color-accent-light;
     }
 
     .badge-toggle {

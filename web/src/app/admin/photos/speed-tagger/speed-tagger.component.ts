@@ -77,7 +77,7 @@ import { environment } from '../../../../environments/environment';
     }
     .back { color: $color-text-muted; text-decoration: none; font-size: $font-size-small; transition: color 0.15s; }
     .back:hover { color: $color-forest-light; }
-    .tagger-header h2 { margin: 0; color: $color-forest; font-family: $font-family; font-weight: $font-heading-weight; }
+    .tagger-header h2 { margin: 0; color: $color-forest; font-family: $font-display; font-weight: $font-heading-weight; text-transform: uppercase; letter-spacing: 0.5px; }
     .progress-text { color: $color-success; }
     .hints { color: $color-text-muted; font-size: 0.8rem; margin-left: auto; }
     .main-photo {
@@ -105,14 +105,13 @@ import { environment } from '../../../../environments/environment';
       font-size: 1.1rem;
       &:focus {
         outline: none;
-        border-color: $color-forest-light;
-        box-shadow: 0 0 0 2px rgba(74, 123, 90, 0.15);
+        border-color: $color-accent;
+        box-shadow: 0 0 0 2px rgba(184, 145, 58, 0.15);
       }
     }
     .bib-input-row .btn-primary {
-      background: $color-forest;
-      color: $color-cream;
-      border: none;
+      background: $color-accent;
+      color: white;
     }
     .thumbnail-strip {
       display: flex;
@@ -132,7 +131,7 @@ import { environment } from '../../../../environments/environment';
       opacity: 0.5;
       transition: opacity 0.2s, border-color 0.2s;
     }
-    .strip-thumb.current { border-color: $color-sand-light; opacity: 1; }
+    .strip-thumb.current { border-color: $color-accent; opacity: 1; }
     .strip-thumb.tagged { border-color: $color-success; opacity: 0.8; }
     .strip-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .all-tagged {
