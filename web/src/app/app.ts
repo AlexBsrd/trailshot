@@ -15,10 +15,22 @@ import { NavbarComponent } from './layout/navbar/navbar.component';
     </main>
     @if (!isAdmin()) {
       <footer class="footer">
-        <span>&copy; {{ year }} TrailShot</span>
-        @if (isHome()) {
-          <a routerLink="/admin">Administration</a>
-        }
+        <div class="footer-content">
+          <div class="footer-brand">
+            <span class="footer-logo">TRAILSHOT</span>
+            <p class="footer-tagline">Vos moments de trail, capturés.</p>
+          </div>
+          <nav class="footer-nav">
+            <a routerLink="/events">Courses</a>
+            <a routerLink="/about">À propos</a>
+            @if (isHome()) {
+              <a routerLink="/admin">Administration</a>
+            }
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          <span>&copy; {{ year }} TrailShot</span>
+        </div>
       </footer>
     }
   `,
@@ -41,22 +53,59 @@ import { NavbarComponent } from './layout/navbar/navbar.component';
       padding-top: 0;
     }
     .footer {
+      background: $color-forest;
+      color: $color-cream;
+      padding: 0;
+      position: relative;
+    }
+    .footer-content {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 2rem;
-      background: $color-forest;
-      color: rgba($color-cream, 0.7);
-      font-size: $font-size-small;
+      align-items: start;
+      padding: 3rem 2rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      gap: 2rem;
     }
-    .footer a {
-      color: rgba($color-cream, 0.7);
-      text-decoration: none;
-      transition: opacity 0.2s;
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
     }
-    .footer a:hover {
-      opacity: 1;
+    .footer-logo {
+      font-family: $font-display;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: 3px;
       color: $color-cream;
+      text-transform: uppercase;
+    }
+    .footer-tagline {
+      font-size: $font-size-small;
+      color: rgba($color-cream, 0.5);
+      font-style: italic;
+    }
+    .footer-nav {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .footer-nav a {
+      color: rgba($color-cream, 0.6);
+      text-decoration: none;
+      font-size: $font-size-small;
+      transition: color 0.2s;
+    }
+    .footer-nav a:hover {
+      color: $color-cream;
+    }
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1.25rem 2rem;
+      text-align: center;
+      font-size: $font-size-xs;
+      color: rgba($color-cream, 0.4);
     }
   `],
 })

@@ -62,9 +62,11 @@ import { ApiService } from '../../../core/services/api.service';
 
     .upload-page { padding: 2rem; }
     .upload-page h1 {
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
-      color: $color-text;
+      color: $color-forest;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .dropzone {
       border: 2px dashed $color-sand;
@@ -76,7 +78,7 @@ import { ApiService } from '../../../core/services/api.service';
       transition: border-color 0.2s, background 0.2s;
     }
     .dropzone:hover, .dropzone.dragging {
-      border-color: $color-forest-light;
+      border-color: $color-accent;
       background: rgba(74, 123, 90, 0.04);
     }
     .hint { color: $color-text-muted; font-size: $font-size-small; margin-top: 0.5rem; }

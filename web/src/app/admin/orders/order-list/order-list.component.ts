@@ -154,10 +154,12 @@ import { environment } from '../../../../environments/environment';
 
     .orders-page { padding: 2rem; }
     .orders-page h1 {
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
       color: $color-forest;
       font-size: $font-size-h1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Stats */
@@ -175,10 +177,14 @@ import { environment } from '../../../../environments/environment';
       flex-direction: column;
       box-shadow: $shadow-card;
       min-width: 120px;
+      border-top: 3px solid transparent;
     }
+    .stat:nth-child(1) { border-top-color: $color-accent; }
+    .stat:nth-child(2) { border-top-color: $color-forest-light; }
+    .stat:nth-child(3) { border-top-color: $color-sand; }
     .stat-value {
       font-size: 1.5rem;
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
       color: $color-forest;
     }
@@ -188,7 +194,7 @@ import { environment } from '../../../../environments/environment';
     }
 
     /* Table */
-    .table { width: 100%; border-collapse: collapse; }
+    .table { width: 100%; border-collapse: collapse; border-radius: $radius-md; overflow: hidden; box-shadow: $shadow-card; background: white; }
     .table thead th {
       background: rgba(27, 58, 45, 0.05);
     }
@@ -217,8 +223,8 @@ import { environment } from '../../../../environments/environment';
       color: $color-text-muted;
     }
     .order-num-cell {
-      font-family: monospace;
-      font-size: $font-size-xs;
+      font-family: $font-display;
+      font-size: $font-size-small;
       color: $color-forest;
       font-weight: 600;
       white-space: nowrap;
@@ -279,11 +285,13 @@ import { environment } from '../../../../environments/environment';
       }
     }
     .detail-section h3 {
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-subheading-weight;
       color: $color-forest;
       font-size: $font-size-body;
       margin: 0 0 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .detail-field {
       display: flex;

@@ -10,6 +10,7 @@ import { ApiService } from '../../core/services/api.service';
   template: `
     <div class="login-page">
       <div class="login-card">
+        <div class="login-logo">TRAILSHOT</div>
         <h1>Administration</h1>
         <form (ngSubmit)="login()">
           <input type="text" [(ngModel)]="username" name="username" placeholder="Identifiant" class="input" />
@@ -29,28 +30,42 @@ import { ApiService } from '../../core/services/api.service';
     @use 'animations' as *;
 
     .login-page {
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      background: $color-cream;
+      background: radial-gradient(circle at 20% 80%, rgba(74, 123, 90, 0.3) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(196, 90, 48, 0.15) 0%, transparent 50%),
+                  $color-forest;
     }
     .login-card {
-      background: $color-white;
+      background: white;
       padding: 2.5rem;
       border-radius: $radius-lg;
-      width: 100%;
       max-width: 400px;
-      box-shadow: $shadow-elevated;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       @include fade-in-up;
     }
+    .login-logo {
+      font-family: $font-display;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: $color-forest;
+      letter-spacing: 3px;
+      text-align: center;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
     .login-card h1 {
+      font-family: $font-family;
+      font-weight: 500;
+      color: $color-text-muted;
+      font-size: $font-size-body;
       text-align: center;
       margin-bottom: 1.5rem;
-      font-family: $font-family;
-      font-weight: $font-heading-weight;
-      color: $color-forest;
-      font-size: $font-size-h1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     form { display: flex; flex-direction: column; gap: 0.75rem; }
     .input {
@@ -82,8 +97,8 @@ import { ApiService } from '../../core/services/api.service';
     .btn-primary {
       width: 100%;
       padding: 0.7rem;
-      background: $color-forest;
-      color: $color-cream;
+      background: $color-accent;
+      color: white;
       border: none;
       border-radius: $radius-sm;
       font-family: $font-family;
@@ -92,7 +107,7 @@ import { ApiService } from '../../core/services/api.service';
       cursor: pointer;
       transition: background 0.2s ease;
 
-      &:hover:not(:disabled) { background: $color-forest-light; }
+      &:hover:not(:disabled) { background: $color-accent-light; }
       &:disabled { opacity: 0.6; cursor: not-allowed; }
     }
   `],

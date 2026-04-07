@@ -285,9 +285,11 @@ import { environment } from '../../../../environments/environment';
     .back:hover { color: $color-forest-light; }
     .page-header h1 {
       margin: 0.25rem 0 0.15rem;
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
       color: $color-forest;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .meta { color: $color-text-muted; font-size: $font-size-body; }
 
@@ -321,7 +323,7 @@ import { environment } from '../../../../environments/environment';
     .tabs button:hover { color: $color-text; }
     .tabs button.active {
       color: $color-forest;
-      border-bottom-color: $color-forest-light;
+      border-bottom-color: $color-accent;
       font-weight: 600;
     }
 
@@ -339,8 +341,11 @@ import { environment } from '../../../../environments/environment';
     .saved-msg { color: $color-success; font-size: $font-size-body; }
 
     :host .btn-primary {
-      background: $color-forest;
-      color: $color-cream;
+      background: $color-accent;
+      color: $color-white;
+    }
+    :host .btn-primary:hover {
+      background: $color-accent-light;
     }
 
     /* Photos tab */
@@ -393,8 +398,8 @@ import { environment } from '../../../../environments/environment';
     .photo-meta { padding: 0.35rem 0.5rem; }
     .bibs { display: flex; gap: 3px; flex-wrap: wrap; }
     .bib-tag {
-      background: rgba(74, 123, 90, 0.1);
-      color: $color-forest-light;
+      background: rgba(184, 145, 58, 0.1);
+      color: $color-accent;
       padding: 1px 6px;
       border-radius: 3px;
       font-size: 0.7rem;
@@ -406,7 +411,7 @@ import { environment } from '../../../../environments/environment';
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(166, 139, 91, 0.85);
+      background: rgba(184, 145, 58, 0.85);
       color: $color-white;
       text-align: center;
       font-size: 0.65rem;
@@ -454,8 +459,8 @@ import { environment } from '../../../../environments/environment';
       transition: border-color 0.2s, background 0.2s;
     }
     .dropzone:hover, .dropzone.dragging {
-      border-color: $color-forest-light;
-      background: rgba(74, 123, 90, 0.04);
+      border-color: $color-accent;
+      background: rgba(184, 145, 58, 0.04);
     }
     .dropzone-large {
       padding: 4rem 3rem;

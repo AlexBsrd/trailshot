@@ -58,9 +58,11 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
     .event-form-page { padding: 2rem; max-width: 600px; }
 
     h1 {
-      font-family: $font-family;
+      font-family: $font-display;
       font-weight: $font-heading-weight;
       color: $color-forest;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       margin-bottom: 1.25rem;
     }
 
@@ -79,8 +81,16 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
     .form-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
 
     :host .btn-primary {
-      background: $color-forest;
-      color: $color-cream;
+      background: $color-accent;
+      color: $color-white;
+    }
+    :host .btn-primary:hover {
+      background: $color-accent-light;
+    }
+
+    .input:focus {
+      border-color: $color-accent;
+      box-shadow: 0 0 0 3px rgba(184, 145, 58, 0.1);
     }
 
     :host .btn-secondary {
