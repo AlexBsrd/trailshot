@@ -15,9 +15,7 @@ const mockOrder = {
 const mockOrdersService = {
   create: jest.fn().mockResolvedValue(mockOrder),
   findAll: jest.fn().mockResolvedValue([mockOrder]),
-  getDownloadUrls: jest.fn().mockResolvedValue({
-    photos: [{ id: '1', url: 'https://s3/presigned' }],
-  }),
+  streamPhoto: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('OrdersController', () => {
@@ -42,9 +40,10 @@ describe('OrdersController', () => {
     expect(result.downloadToken).toBeDefined();
   });
 
-  it('should return download URLs for valid token', async () => {
-    const result = await controller.download('order-1', 'tok-123');
-    expect(result.photos).toHaveLength(1);
+  it('should stream the photo for a valid token', async () => {
+    const res = {} as any;
+    await controller.download('order-1', 'tok-123', res);
+    expect(mockOrdersService.streamPhoto).toHaveBeenCalledWith('order-1', 'tok-123', res);
   });
 
   it('should list all orders (admin)', async () => {

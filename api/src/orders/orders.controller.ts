@@ -17,8 +17,12 @@ export class OrdersController {
   }
 
   @Get('orders/:id/download')
-  download(@Param('id') id: string, @Query('token') token: string) {
-    return this.ordersService.getDownloadUrls(id, token);
+  download(
+    @Param('id') id: string,
+    @Query('token') token: string,
+    @Res() res: Response,
+  ) {
+    return this.ordersService.streamPhoto(id, token, res);
   }
 
   @Get('orders/:id/download-zip')

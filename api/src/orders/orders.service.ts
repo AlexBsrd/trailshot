@@ -80,10 +80,8 @@ export class OrdersService {
     return this.orderRepo.findOneOrFail({ where: { id: savedOrder.id } });
   }
 
-  async getDownloadUrls(
-    orderId: string,
-    token: string,
-  ): Promise<{ photos: { id: string; url: string; filename: string }[] }> {
+  // Shared guard for all download routes.
+  private async loadValidOrder(orderId: string, token: string): Promise<Order> {
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
       relations: ['orderPhotos'],
@@ -96,31 +94,27 @@ export class OrdersService {
     if (new Date() > order.downloadExpiresAt) {
       throw new ForbiddenException('Download link expired');
     }
+    return order;
+  }
 
-    const photos = await Promise.all(
-      order.orderPhotos.map(async (op) => {
-        const photo = await this.photoRepo.findOneOrFail({ where: { id: op.photoId } });
-        const url = await this.storage.getPresignedUrl(photo.originalKey, 300);
-        return { id: photo.id, url, filename: `trailshot-${photo.id}.jpg` };
-      }),
-    );
-
-    return { photos };
+  // Single photo: stream the original through the API (the S3 endpoint is
+  // internal-only, so a presigned URL can't be handed to the browser directly).
+  async streamPhoto(orderId: string, token: string, res: any): Promise<void> {
+    const order = await this.loadValidOrder(orderId, token);
+    const photo = await this.photoRepo.findOneOrFail({
+      where: { id: order.orderPhotos[0].photoId },
+    });
+    const url = await this.storage.getPresignedUrl(photo.originalKey, 300);
+    const response = await fetch(url);
+    res.set({
+      'Content-Type': 'image/jpeg',
+      'Content-Disposition': `attachment; filename="trailshot-${photo.id}.jpg"`,
+    });
+    res.send(Buffer.from(await response.arrayBuffer()));
   }
 
   async streamZip(orderId: string, token: string, res: any): Promise<void> {
-    const order = await this.orderRepo.findOne({
-      where: { id: orderId },
-      relations: ['orderPhotos'],
-    });
-    if (!order) throw new NotFoundException('Order not found');
-    if (order.downloadToken !== token) throw new ForbiddenException('Invalid token');
-    if (order.status !== 'delivered' && order.status !== 'paid') {
-      throw new ForbiddenException('Order not yet paid');
-    }
-    if (new Date() > order.downloadExpiresAt) {
-      throw new ForbiddenException('Download link expired');
-    }
+    const order = await this.loadValidOrder(orderId, token);
 
     const archiver = require('archiver');
     const archive = archiver('zip', { zlib: { level: 5 } });

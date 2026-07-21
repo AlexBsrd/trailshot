@@ -41,10 +41,6 @@ export interface OrderResult {
   downloadExpiresAt: string;
 }
 
-export interface DownloadResult {
-  photos: { id: string; url: string; filename: string }[];
-}
-
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
@@ -79,12 +75,6 @@ export class ApiService {
     eventId: string; email: string; photoIds: string[]; isPack: boolean;
   }): Observable<OrderResult> {
     return this.http.post<OrderResult>(`${this.base}/orders`, data);
-  }
-
-  getDownload(orderId: string, token: string): Observable<DownloadResult> {
-    return this.http.get<DownloadResult>(`${this.base}/orders/${orderId}/download`, {
-      params: { token },
-    });
   }
 
   // Admin - Auth

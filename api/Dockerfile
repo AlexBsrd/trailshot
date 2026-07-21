@@ -10,6 +10,7 @@ COPY . .
 RUN npm run build
 
 FROM node:22-alpine AS prod
+ENV NODE_ENV=production
 RUN apk add --no-cache fontconfig ttf-freefont
 WORKDIR /app
 COPY --from=build /app/dist ./dist

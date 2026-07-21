@@ -259,14 +259,9 @@ export class PhotoDetailComponent implements OnInit, OnDestroy {
         photoIds: [photo.id],
         isPack: false,
       }).subscribe((order) => {
-        this.api.getDownload(order.id, order.downloadToken).subscribe((dl) => {
-          if (dl.photos.length > 0) {
-            const a = document.createElement('a');
-            a.href = dl.photos[0].url;
-            a.download = dl.photos[0].filename;
-            a.click();
-          }
-        });
+        const a = document.createElement('a');
+        a.href = `${environment.apiUrl}/orders/${order.id}/download?token=${order.downloadToken}`;
+        a.click();
       });
     }
   }
