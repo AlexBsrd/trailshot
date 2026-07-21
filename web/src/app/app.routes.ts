@@ -25,4 +25,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'events', pathMatch: 'full' },
     ],
   },
+
+  // ponytail: pas de page 404 dédiée — redirection accueil, suffisant pour un site vitrine
+  { path: '**', redirectTo: '' },
 ];

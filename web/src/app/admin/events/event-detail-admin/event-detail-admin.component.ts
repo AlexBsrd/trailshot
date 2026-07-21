@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, EventSummary, PhotoSummary, UploadResult } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
@@ -7,7 +8,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-event-detail-admin',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, DatePipe],
   template: `
     <div class="page">
       @if (event()) {
@@ -16,7 +17,7 @@ import { environment } from '../../../../environments/environment';
           <div>
             <a routerLink="/admin/events" class="back">&larr; Courses</a>
             <h1>{{ event()!.name }}</h1>
-            <p class="meta">{{ event()!.date }} · {{ event()!.location }} · {{ photos().length }} photo(s)</p>
+            <p class="meta">{{ event()!.date | date:'longDate' }} · {{ event()!.location }} · {{ photos().length }} photo{{ photos().length > 1 ? 's' : '' }}</p>
           </div>
           <div class="header-actions">
             <button
@@ -153,9 +154,9 @@ import { environment } from '../../../../environments/environment';
 
                   @if (uploadDone()) {
                     <div class="upload-summary">
-                      <p class="summary-line summary-created">{{ uploadResult()!.created.length }} photo(s) importée(s)</p>
+                      <p class="summary-line summary-created">{{ uploadResult()!.created.length }} photo{{ uploadResult()!.created.length > 1 ? 's' : '' }} importée{{ uploadResult()!.created.length > 1 ? 's' : '' }}</p>
                       @if (uploadResult()!.skipped.length > 0) {
-                        <p class="summary-line summary-skipped">{{ uploadResult()!.skipped.length }} ignorée(s) (doublons)</p>
+                        <p class="summary-line summary-skipped">{{ uploadResult()!.skipped.length }} ignorée{{ uploadResult()!.skipped.length > 1 ? 's' : '' }} (doublons)</p>
                       }
                       @if (uploadErrors().length > 0) {
                         <p class="summary-line summary-error">{{ uploadErrors().length }} en erreur</p>
@@ -168,7 +169,7 @@ import { environment } from '../../../../environments/environment';
                 <!-- Toolbar -->
                 <div class="photos-toolbar">
                   @if (selected().size > 0) {
-                    <span>{{ selected().size }} sélectionnée(s)</span>
+                    <span>{{ selected().size }} sélectionnée{{ selected().size > 1 ? 's' : '' }}</span>
                     <button class="btn btn-danger btn-sm" (click)="deleteSelected()">Supprimer</button>
                     <button class="btn btn-secondary btn-sm" (click)="clearSelection()">Désélectionner</button>
                   } @else {
@@ -189,7 +190,7 @@ import { environment } from '../../../../environments/environment';
               <!-- Photo grid -->
               @if (filteredPhotos().length > 0) {
                 @if (bibFilter()) {
-                  <p class="filter-info">{{ filteredPhotos().length }} photo(s) pour le dossard "{{ bibFilter() }}"
+                  <p class="filter-info">{{ filteredPhotos().length }} photo{{ filteredPhotos().length > 1 ? 's' : '' }} pour le dossard "{{ bibFilter() }}"
                     <button class="btn-link" (click)="bibFilter.set('')">Effacer le filtre</button>
                   </p>
                 }

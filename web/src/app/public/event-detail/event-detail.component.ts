@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, EventSummary, PhotoSummary } from '../../core/services/api.service';
 import { CartService } from '../../core/services/cart.service';
@@ -9,13 +10,13 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [RouterLink, FormsModule, ScrollRevealDirective],
+  imports: [RouterLink, FormsModule, ScrollRevealDirective, DatePipe],
   template: `
     <div class="event-detail" [class.has-sticky-bar]="cart.count() > 0">
       @if (event()) {
         <div class="event-header">
           <h1>{{ event()!.name }}</h1>
-          <p class="event-meta">{{ event()!.date }} &middot; {{ event()!.location }}</p>
+          <p class="event-meta">{{ event()!.date | date:'longDate' }} &middot; {{ event()!.location }}</p>
           @if (event()!.isFree) {
             <span class="badge-free">Gratuit</span>
           }
@@ -72,8 +73,6 @@ import { environment } from '../../../environments/environment';
               <img [src]="getThumbnailUrl(photo)" [alt]="'Photo'" loading="lazy" />
               @if (!event()!.isFree) {
                 <div class="photo-price">{{ formatPrice(event()!.priceSingle) }}</div>
-              } @else {
-                <div class="photo-price photo-price--free">Gratuit</div>
               }
               <button
                 class="select-btn"
@@ -135,7 +134,7 @@ import { environment } from '../../../environments/environment';
 
         @if (cart.count() > 0) {
           <div class="sticky-bar">
-            <span class="sticky-count">{{ cart.count() }} photo(s) sélectionnée(s)</span>
+            <span class="sticky-count">{{ cart.count() }} photo{{ cart.count() > 1 ? 's' : '' }} sélectionnée{{ cart.count() > 1 ? 's' : '' }}</span>
             @if (!event()!.isFree) {
               @if (packBetterDeal()) {
                 <span class="sticky-pricing">
@@ -180,11 +179,12 @@ import { environment } from '../../../environments/environment';
       color: $color-forest;
       font-family: $font-display;
       font-weight: $font-heading-weight;
-      font-size: $font-size-hero;
+      font-size: clamp(1.75rem, 6vw, $font-size-hero);
       margin: 0 0 0.25rem;
       line-height: 1.15;
       text-transform: uppercase;
       letter-spacing: 1px;
+      overflow-wrap: anywhere;
     }
     .event-meta {
       color: $color-sand;
@@ -443,13 +443,6 @@ import { environment } from '../../../environments/environment';
       border-radius: $radius-sm;
       font-size: $font-size-xs;
       color: $color-cream;
-
-      &--free {
-        background: $color-forest-light;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
     }
     .sticky-total--free {
       color: $color-sand-light;
@@ -821,6 +814,6 @@ export class EventDetailComponent implements OnInit {
   }
 
   formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2) + ' \u20AC';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(cents / 100);
   }
 }

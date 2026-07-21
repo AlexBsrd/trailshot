@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, EventSummary } from '../../core/services/api.service';
 import { environment } from '../../../environments/environment';
@@ -8,7 +9,7 @@ import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.dir
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [RouterLink, FormsModule, ScrollRevealDirective],
+  imports: [RouterLink, FormsModule, ScrollRevealDirective, DatePipe],
   template: `
     <div class="events-page">
       <div class="events-header">
@@ -29,7 +30,7 @@ import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.dir
             <div class="event-card-img" [style.background-image]="event.coverPhotoId ? 'url(' + getCoverUrl(event) + ')' : ''"></div>
             <div class="event-card-overlay">
               <h3>{{ event.name }}</h3>
-              <p class="event-meta">{{ event.date }} · {{ event.location }}</p>
+              <p class="event-meta">{{ event.date | date:'longDate' }} · {{ event.location }}</p>
               @if (event.isFree) {
                 <span class="badge badge-free">Gratuit</span>
               }

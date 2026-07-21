@@ -48,7 +48,7 @@ import { environment } from '../../../environments/environment';
                     </div>
                   }
                   <div class="photo-item-info">
-                    <span class="photo-item-id">Photo</span>
+                    <span class="photo-item-id">Photo {{ $index + 1 }}</span>
                     @if (!cart.isPackMode() && cart.event()) {
                       <span class="photo-item-price">{{ cart.event()!.isFree ? 'Gratuit' : formatPrice(cart.event()!.priceSingle) }}</span>
                     }
@@ -583,7 +583,7 @@ export class OrderComponent {
   }
 
   formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2) + ' \u20AC';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(cents / 100);
   }
 
   copyLink(input: HTMLInputElement) {
@@ -613,7 +613,10 @@ export class OrderComponent {
 
     this.api.createOrder({ eventId, email, photoIds, isPack }).subscribe({
       next: (order) => {
-        const baseUrl = environment.apiUrl;
+        // URL absolue : le lien affiché doit rester valable copié hors du site
+        const baseUrl = environment.apiUrl.startsWith('http')
+          ? environment.apiUrl
+          : window.location.origin + environment.apiUrl;
         if (photoIds.length > 1) {
           this.downloadUrl.set(`${baseUrl}/orders/${order.id}/download-zip?token=${order.downloadToken}`);
         } else {

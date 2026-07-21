@@ -1,11 +1,12 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatePipe, CurrencyPipe } from '@angular/common';
 import { ApiService, EventSummary } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-event-list',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe, CurrencyPipe],
   template: `
     <div class="event-list">
       <div class="header">
@@ -28,13 +29,13 @@ import { ApiService, EventSummary } from '../../../core/services/api.service';
           @for (event of events(); track event.id) {
             <tr>
               <td>{{ event.name }}</td>
-              <td>{{ event.date }}</td>
+              <td>{{ event.date | date:'shortDate' }}</td>
               <td>{{ event.location }}</td>
               <td>
                 @if (event.isFree) {
                   <span class="badge badge-free">Gratuit</span>
                 } @else {
-                  {{ (event.priceSingle / 100).toFixed(2) }} / {{ (event.pricePack / 100).toFixed(2) }}
+                  {{ event.priceSingle / 100 | currency:'EUR' }} / {{ event.pricePack / 100 | currency:'EUR' }}
                 }
               </td>
               <td>

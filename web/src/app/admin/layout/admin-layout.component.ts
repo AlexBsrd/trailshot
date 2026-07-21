@@ -58,7 +58,8 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
     .sidebar-logo {
       display: flex;
       align-items: baseline;
-      gap: 0;
+      flex-wrap: wrap;
+      row-gap: 4px;
       padding: 1.5rem;
       text-decoration: none;
       font-size: 1.1rem;

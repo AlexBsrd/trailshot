@@ -15,8 +15,9 @@ import { environment } from '../../../../environments/environment';
           <span class="stat-label">Commandes</span>
         </div>
         <div class="stat">
-          <span class="stat-value">{{ formatPrice(totalRevenue()) }}</span>
-          <span class="stat-label">Revenus</span>
+          <!-- ponytail: € dans le libellé — le glyphe € de Syne est illisible -->
+          <span class="stat-value">{{ (totalRevenue() / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) }}</span>
+          <span class="stat-label">Revenus (€)</span>
         </div>
         <div class="stat">
           <span class="stat-value">{{ uniqueEmails() }}</span>
@@ -453,7 +454,7 @@ export class OrderListComponent implements OnInit {
   }
 
   formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2) + ' \u20AC';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(cents / 100);
   }
 
   formatDateTime(date: string): string {

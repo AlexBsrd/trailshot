@@ -238,7 +238,7 @@ export class PhotoDetailComponent implements OnInit, OnDestroy {
   }
 
   formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2) + ' \u20AC';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(cents / 100);
   }
 
   buyPhoto() {

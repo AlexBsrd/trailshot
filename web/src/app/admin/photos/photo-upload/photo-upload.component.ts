@@ -45,7 +45,7 @@ import { ApiService } from '../../../core/services/api.service';
 
       @if (uploadComplete()) {
         <div class="success">
-          <p>{{ uploadedCount() }} photo(s) uploadée(s) avec succes !</p>
+          <p>{{ uploadedCount() }} photo{{ uploadedCount() > 1 ? 's' : '' }} importée{{ uploadedCount() > 1 ? 's' : '' }} avec succès !</p>
           <div class="actions">
             <a [routerLink]="['/admin/events', eventId, 'tagger']" class="btn btn-primary">
               Tagger les photos
