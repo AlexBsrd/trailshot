@@ -28,14 +28,19 @@ import { environment } from '../../../environments/environment';
         <div class="filter-zone" [style.background-image]="event()!.coverPhotoId ? 'url(' + getCoverUrl(event()!) + ')' : ''">
           <div class="filter-zone-overlay">
             <form (ngSubmit)="searchBib()" class="search-form">
-              <input
-                type="text"
-                [(ngModel)]="bibInput"
-                name="bib"
-                placeholder="Numéro de dossard"
-                class="bib-input"
-              />
-              <button type="submit" class="btn-search">Rechercher</button>
+              <label class="bib-plate">
+                <span class="bib-plate-strip">Dossard</span>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  [(ngModel)]="bibInput"
+                  name="bib"
+                  placeholder="000"
+                  class="bib-plate-input"
+                  aria-label="Numéro de dossard"
+                />
+              </label>
+              <button type="submit" class="btn-search">Retrouver mes photos</button>
               @if (activeBib()) {
                 <button type="button" class="btn-search btn-secondary" (click)="clearBib()">
                   Voir toutes les photos
@@ -242,30 +247,67 @@ import { environment } from '../../../environments/environment';
     }
     .search-form {
       display: flex;
-      gap: 0.75rem;
+      gap: 1rem;
       flex-wrap: wrap;
       max-width: 1200px;
       margin: 0 auto;
       align-items: center;
+      justify-content: center;
     }
-    .bib-input {
-      flex: 1;
-      min-width: 180px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: $color-cream;
-      border-radius: 8px;
-      padding: 0.65rem 1rem;
-      font-size: $font-size-body;
-      font-family: $font-family;
+    /* La plaque de dossard — élément signature du site */
+    .bib-plate {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: $color-white;
+      border-radius: 10px;
+      padding: 0.55rem 1.5rem 0.45rem;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      cursor: text;
+
+      /* trous d'épingles */
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 9px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(27, 58, 45, 0.3);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+      }
+      &::before { left: 10px; }
+      &::after { right: 10px; }
+
+      &:focus-within {
+        outline: 2px solid $color-accent-light;
+        outline-offset: 2px;
+      }
+    }
+    .bib-plate-strip {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: $color-sand;
+      user-select: none;
+    }
+    .bib-plate-input {
+      border: none;
       outline: none;
-      transition: border-color 0.2s;
+      background: none;
+      font-family: $font-family;
+      font-weight: 800;
+      font-size: 1.9rem;
+      line-height: 1.1;
+      color: $color-forest;
+      text-align: center;
+      width: 7ch;
 
       &::placeholder {
-        color: rgba(250, 247, 242, 0.5);
-      }
-      &:focus {
-        border-color: rgba(255, 255, 255, 0.35);
+        color: rgba(27, 58, 45, 0.18);
       }
     }
     .btn-search {
@@ -346,22 +388,24 @@ import { environment } from '../../../environments/environment';
       &:hover { background-color: $color-accent-light; }
     }
 
-    /* ── Photo Grid ── */
+    /* ── Photo Grid — masonry : chaque photo garde son ratio ── */
     .photo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
+      columns: 240px;
+      column-gap: 12px;
       padding: 0 2rem;
       max-width: 1200px;
       margin: 0 auto;
 
       @media (max-width: $breakpoint-sm) {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        columns: 150px;
+        column-gap: 8px;
         padding: 0 1rem;
       }
     }
     .photo-card {
       position: relative;
+      margin-bottom: 12px;
+      break-inside: avoid;
       cursor: pointer;
       border-radius: $radius-sm;
       overflow: hidden;
@@ -391,8 +435,6 @@ import { environment } from '../../../environments/environment';
     .photo-card img {
       width: 100%;
       display: block;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
     }
     .select-btn {
       position: absolute;

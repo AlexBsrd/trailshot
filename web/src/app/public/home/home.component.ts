@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +11,7 @@ import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.dir
   standalone: true,
   imports: [RouterLink, FormsModule, ScrollRevealDirective, DatePipe],
   template: `
-    <section class="hero">
+    <section class="hero" [style.background-image]="heroBg()">
       <div class="hero-content">
         <h1>Trouvez vos <span class="hero-accent">photos</span> de course</h1>
         <p class="hero-subtitle">Recherchez par numéro de dossard et téléchargez vos photos de trail</p>
@@ -360,6 +360,14 @@ export class HomeComponent implements OnInit {
   events = signal<EventSummary[]>([]);
   selectedSlug = '';
   bibNumber = '';
+
+  // Héros = photo de couverture (choisie par l'admin) du dernier événement, fallback image statique
+  heroBg = computed(() => {
+    const ev = this.events().find((e) => e.coverPhotoId);
+    return ev
+      ? `url('${environment.storageUrl}/previews/${ev.id}/${ev.coverPhotoId}.jpg'), url('/images/hero-default.jpg')`
+      : null;
+  });
 
   ngOnInit() {
     this.api.getEvents().subscribe((events) => this.events.set(events));
