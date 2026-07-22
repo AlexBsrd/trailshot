@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#1b3a2d"/>
+  <!-- back peak -->
+  <path d="M14 48 L30 22 L42 40 L38 48 Z" fill="#8c8272"/>
+  <!-- front peak with snow cap -->
+  <path d="M28 48 L44 20 L60 48 Z" fill="#f2efe9"/>
+  <path d="M44 20 L38.5 29.5 L41 32 L44 28.5 L47 32 L49.5 29.5 Z" fill="#1b3a2d"/>
+</svg>
