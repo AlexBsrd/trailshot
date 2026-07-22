@@ -167,8 +167,8 @@ export class OrdersService {
     const eventName = order.event?.name ?? '-';
 
     return new Promise<Buffer>((resolve, reject) => {
-      const fontRegular = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
-      const fontBold = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
+      const fontRegular = '/usr/share/fonts/dejavu/DejaVuSans.ttf';
+      const fontBold = '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf';
       const doc = new PDFDocument({ size: 'A4', margin: 50, ligatures: false } as any);
       const chunks: Buffer[] = [];
       doc.on('data', (chunk: Buffer) => chunks.push(chunk));

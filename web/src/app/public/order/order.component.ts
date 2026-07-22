@@ -153,7 +153,7 @@ import { environment } from '../../../environments/environment';
             </div>
           </div>
 
-          <a routerLink="/events" class="btn-secondary">Retour aux courses</a>
+          <a routerLink="/" class="btn-secondary">Retour à l'accueil</a>
         </div>
       }
     </div>
