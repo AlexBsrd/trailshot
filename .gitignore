@@ -3,4 +3,5 @@ dist/
 .angular/
 .env
 *.local
+deploy.log
 .superpowers/

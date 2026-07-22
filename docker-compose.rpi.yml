@@ -1,0 +1,116 @@
+# Raspberry Pi deploy — fronted by the shared Traefik on the external `proxy`
+# network (replaces the Caddy in docker-compose.yml). One host, three routers:
+#   /api/*     -> api:3000
+#   /storage/* -> (strip /storage) -> minio:9000
+#   /*         -> web:4000   (SSR)
+# Traefik gives PathPrefix rules higher priority than the bare Host rule, so
+# /api and /storage win and everything else falls through to web.
+#
+# Deploy:  cp .env.example .env  (set JWT_SECRET + ADMIN_PASSWORD), then
+#          docker compose -f docker-compose.rpi.yml up -d --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: trailshot
+      POSTGRES_USER: trailshot
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-trailshot_dev}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [internal]
+
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY:-minioadmin}
+    volumes:
+      - miniodata:/data
+    networks: [internal, proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.trailshot-storage.rule=Host(`trailshot.bsrd.fr`) && PathPrefix(`/storage`)
+      - traefik.http.routers.trailshot-storage.entrypoints=websecure
+      - traefik.http.routers.trailshot-storage.tls.certresolver=letsencrypt
+      - traefik.http.routers.trailshot-storage.middlewares=trailshot-storage-strip
+      - traefik.http.middlewares.trailshot-storage-strip.stripprefix.prefixes=/storage
+      - traefik.http.services.trailshot-storage.loadbalancer.server.port=9000
+      - traefik.http.services.trailshot-storage.loadbalancer.passhostheader=false
+
+  minio-init:
+    image: minio/minio
+    depends_on: [minio]
+    entrypoint: /bin/sh
+    command: -c "sleep 3 && mc alias set local http://minio:9000 ${S3_ACCESS_KEY_ID:-minioadmin} ${S3_SECRET_ACCESS_KEY:-minioadmin} && mc mb --ignore-existing local/trailshot && mc anonymous set download local/trailshot/previews && mc anonymous set download local/trailshot/thumbnails"
+    restart: "no"
+    networks: [internal]
+
+  api:
+    build:
+      context: ./api
+      target: prod
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: trailshot
+      DB_PASSWORD: ${DB_PASSWORD:-trailshot_dev}
+      DB_DATABASE: trailshot
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: trailshot
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-minioadmin}
+      JWT_SECRET: ${JWT_SECRET:-}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      API_URL: https://trailshot.bsrd.fr/api
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_SECURE: ${MAIL_SECURE:-false}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-noreply@trailshot.bsrd.fr}
+    depends_on: [postgres, minio-init]
+    networks: [internal, proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.trailshot-api.rule=Host(`trailshot.bsrd.fr`) && PathPrefix(`/api`)
+      - traefik.http.routers.trailshot-api.entrypoints=websecure
+      - traefik.http.routers.trailshot-api.tls.certresolver=letsencrypt
+      - traefik.http.services.trailshot-api.loadbalancer.server.port=3000
+
+  web:
+    build:
+      context: ./web
+      target: prod
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      API_URL: http://api:3000
+      STORAGE_URL: http://minio:9000
+    depends_on: [api]
+    networks: [internal, proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.trailshot-web.rule=Host(`trailshot.bsrd.fr`)
+      - traefik.http.routers.trailshot-web.entrypoints=websecure
+      - traefik.http.routers.trailshot-web.tls.certresolver=letsencrypt
+      - traefik.http.services.trailshot-web.loadbalancer.server.port=4000
+
+volumes:
+  pgdata:
+  miniodata:
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  internal:
